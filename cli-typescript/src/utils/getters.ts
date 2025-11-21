@@ -30,13 +30,13 @@ import {
   berachain,
   bsc,
   mainnet,
-  monadTestnet,
   polygon,
   sei,
   sepolia,
 } from 'viem/chains';
 import { Hex } from 'viem';
 import { setBaseDir } from './setters';
+import { monad } from '../cmds/networks';
 
 /**
  * Retrieves the transfer validator address based on the network (chain ID).
@@ -94,7 +94,7 @@ export const getSymbolFromChainId = (chainId: SUPPORTED_CHAINS): string => {
       return 'ARB';
     case SUPPORTED_CHAINS.ABSTRACT:
       return 'ETH';
-    case SUPPORTED_CHAINS.MONAD_TESTNET:
+    case SUPPORTED_CHAINS.MONAD:
       return 'MON';
     case SUPPORTED_CHAINS.AVALANCHE:
       return 'AVAX';
@@ -153,8 +153,8 @@ export const getViemChainByChainId = (chainId: SUPPORTED_CHAINS) => {
       return arbitrum;
     case SUPPORTED_CHAINS.ABSTRACT:
       return abstract;
-    case SUPPORTED_CHAINS.MONAD_TESTNET:
-      return monadTestnet;
+    case SUPPORTED_CHAINS.MONAD:
+      return monad;
     case SUPPORTED_CHAINS.AVALANCHE:
       return avalanche;
     default:
@@ -277,8 +277,6 @@ export const getImplId = (
     case SUPPORTED_CHAINS.ETHEREUM:
       return 10;
     case SUPPORTED_CHAINS.BERACHAIN:
-      return 5;
-    case SUPPORTED_CHAINS.MONAD_TESTNET:
       return 5;
     case SUPPORTED_CHAINS.AVALANCHE:
       return 6;
