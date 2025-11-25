@@ -11,7 +11,6 @@ import {CreatorTokenBase} from "@limitbreak/creator-token-standards/src/utils/Cr
 import {AutomaticValidatorTransferApproval} from
     "@limitbreak/creator-token-standards/src/utils/AutomaticValidatorTransferApproval.sol";
 import {ICreatorToken} from "@limitbreak/creator-token-standards/src/interfaces/ICreatorToken.sol";
-import {TOKEN_TYPE_ERC1155} from "@limitbreak/permit-c/Constants.sol";
 /// @title ERC1155CM
 /// @notice An ERC1155 contract with multi-stage minting, royalties, authorized minters, and Creator Token functionality
 /// @dev Extends ERC1155C with ERC1155M functionality
@@ -68,7 +67,7 @@ contract ERC1155CM is ERC1155M, CreatorTokenBase, AutomaticValidatorTransferAppr
     }
 
     function _tokenType() internal pure override returns (uint16) {
-        return uint16(TOKEN_TYPE_ERC1155);
+        return uint16(1155); // TOKEN_TYPE_ERC1155
     }
 
     /// @notice Checks if the contract supports a given interface

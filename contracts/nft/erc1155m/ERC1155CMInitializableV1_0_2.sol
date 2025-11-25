@@ -7,7 +7,6 @@ import {CreatorTokenBase} from "@limitbreak/creator-token-standards/src/utils/Cr
 import {AutomaticValidatorTransferApproval} from
     "@limitbreak/creator-token-standards/src/utils/AutomaticValidatorTransferApproval.sol";
 import {ICreatorToken} from "@limitbreak/creator-token-standards/src/interfaces/ICreatorToken.sol";
-import {TOKEN_TYPE_ERC1155} from "@limitbreak/permit-c/Constants.sol";
 import {ContextUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
 import {Context} from "@openzeppelin/contracts/utils/Context.sol";
 
@@ -74,7 +73,7 @@ contract ERC1155CMInitializableV1_0_2 is
     }
 
     function _tokenType() internal pure override returns (uint16) {
-        return uint16(TOKEN_TYPE_ERC1155);
+        return uint16(1155); // TOKEN_TYPE_ERC1155
     }
 
     /// @notice Checks if the contract supports a given interface
