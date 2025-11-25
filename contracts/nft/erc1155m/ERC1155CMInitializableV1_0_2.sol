@@ -101,7 +101,9 @@ contract ERC1155CMInitializableV1_0_2 is
         uint256 len = ids.length;
         for (uint256 i; i < len;) {
             _validateAfterTransfer(from, to, ids[i], amounts[i]);
-            unchecked { ++i; }
+            unchecked {
+                ++i;
+            }
         }
     }
 
@@ -118,7 +120,9 @@ contract ERC1155CMInitializableV1_0_2 is
         uint256 len = ids.length;
         for (uint256 i; i < len;) {
             _validateBeforeTransfer(from, to, ids[i], amounts[i]);
-            unchecked { ++i; }
+            unchecked {
+                ++i;
+            }
         }
     }
 
