@@ -3,10 +3,6 @@
 pragma solidity ^0.8.22;
 
 import {ERC1155MInitializableV1_0_2} from "./ERC1155MInitializableV1_0_2.sol";
-import {ERC1155MStorage} from "./ERC1155MStorage.sol";
-import {MintStageInfo1155} from "../../common/Structs.sol";
-import {AuthorizedMinterControl} from "../../common/AuthorizedMinterControl.sol";
-import {LAUNCHPAD_MINT_FEE_RECEIVER} from "../../utils/Constants.sol";
 import {CreatorTokenBase} from "@limitbreak/creator-token-standards/src/utils/CreatorTokenBase.sol";
 import {AutomaticValidatorTransferApproval} from
     "@limitbreak/creator-token-standards/src/utils/AutomaticValidatorTransferApproval.sol";
@@ -64,7 +60,7 @@ contract ERC1155CMInitializableV1_0_2 is
 
     /// @notice Returns the contract name and version
     /// @return The contract name and version as strings
-    function contractNameAndVersion() public pure virtual override returns (string memory, string memory) {
+    function contractNameAndVersion() public pure override returns (string memory, string memory) {
         return ("ERC1155CMInitializable", "1.0.2");
     }
 
