@@ -75,9 +75,11 @@ contract ERC721BatchTransfer {
      * @param tos the list of addresses that will receive the nfts
      * @param tokenIds the list of tokens that will be transferred
      */
-    function batchTransferToMultipleWallets(IERC721 erc721Contract, address[] calldata tos, uint256[] calldata tokenIds)
-        external
-    {
+    function batchTransferToMultipleWallets(
+        IERC721 erc721Contract,
+        address[] calldata tos,
+        uint256[] calldata tokenIds
+    ) external {
         uint256 length = tokenIds.length;
         if (tos.length != length) revert InvalidArguments();
 

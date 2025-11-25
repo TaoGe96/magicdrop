@@ -8,8 +8,9 @@ import {MintStageInfo1155} from "../../common/Structs.sol";
 import {AuthorizedMinterControl} from "../../common/AuthorizedMinterControl.sol";
 import {LAUNCHPAD_MINT_FEE_RECEIVER} from "../../utils/Constants.sol";
 import {CreatorTokenBase} from "@limitbreak/creator-token-standards/src/utils/CreatorTokenBase.sol";
-import {AutomaticValidatorTransferApproval} from
-    "@limitbreak/creator-token-standards/src/utils/AutomaticValidatorTransferApproval.sol";
+import {
+    AutomaticValidatorTransferApproval
+} from "@limitbreak/creator-token-standards/src/utils/AutomaticValidatorTransferApproval.sol";
 import {ICreatorToken} from "@limitbreak/creator-token-standards/src/interfaces/ICreatorToken.sol";
 /// @title ERC1155CM
 /// @notice An ERC1155 contract with multi-stage minting, royalties, authorized minters, and Creator Token functionality
@@ -45,7 +46,6 @@ contract ERC1155CM is ERC1155M, CreatorTokenBase, AutomaticValidatorTransferAppr
             mintFee
         )
     {}
-
 
     /*==============================================================
     =                             META                             =

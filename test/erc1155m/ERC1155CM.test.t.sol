@@ -9,7 +9,9 @@ import {MintStageInfo1155} from "contracts/common/Structs.sol";
 import {ICreatorToken} from "@limitbreak/creator-token-standards/src/interfaces/ICreatorToken.sol";
 import {TOKEN_TYPE_ERC1155} from "@limitbreak/permit-c/Constants.sol";
 import {ITransferValidator} from "@limitbreak/creator-token-standards/src/interfaces/ITransferValidator.sol";
-import {ITransferValidatorSetTokenType} from "@limitbreak/creator-token-standards/src/interfaces/ITransferValidatorSetTokenType.sol";
+import {
+    ITransferValidatorSetTokenType
+} from "@limitbreak/creator-token-standards/src/interfaces/ITransferValidatorSetTokenType.sol";
 
 contract ERC1155CMTest is Test {
     ERC1155CM public token;
@@ -30,7 +32,7 @@ contract ERC1155CMTest is Test {
         maxMintableSupply[0] = 1000;
         uint256[] memory globalWalletLimit = new uint256[](1);
         globalWalletLimit[0] = 0; // unlimited
-        
+
         token = new ERC1155CM(
             "TestToken",
             "TT",
@@ -85,7 +87,7 @@ contract ERC1155CMTest is Test {
 
     function testGetTransferValidationFunction() public view {
         (bytes4 functionSignature, bool isViewFunction) = token.getTransferValidationFunction();
-        
+
         bytes4 expectedSignature = bytes4(keccak256("validateTransfer(address,address,address,uint256,uint256)"));
         assertEq(functionSignature, expectedSignature);
         assertFalse(isViewFunction);
@@ -103,16 +105,16 @@ contract ERC1155CMTest is Test {
     function testSetTransferValidator() public {
         // Create a mock validator contract with code
         address mockValidator = address(new MockValidator());
-        
+
         vm.prank(owner);
         token.setTransferValidator(mockValidator);
-        
+
         assertEq(token.getTransferValidator(), mockValidator);
     }
 
     function testSetTransferValidatorRevertsWhenNotOwner() public {
         address mockValidator = address(new MockValidator());
-        
+
         vm.prank(user);
         vm.expectRevert();
         token.setTransferValidator(mockValidator);
@@ -140,7 +142,7 @@ contract ERC1155CMTest is Test {
     function testSetAutomaticApprovalOfTransfersFromValidator() public {
         vm.prank(owner);
         token.setAutomaticApprovalOfTransfersFromValidator(true);
-        
+
         assertTrue(token.autoApproveTransfersFromValidator());
     }
 
@@ -161,7 +163,7 @@ contract ERC1155CMTest is Test {
 
     function testIsApprovedForAllReturnsTrueForCustomValidatorWhenAutoApproveEnabled() public {
         address mockValidator = address(new MockValidator());
-        
+
         vm.startPrank(owner);
         token.setTransferValidator(mockValidator);
         token.setAutomaticApprovalOfTransfersFromValidator(true);
@@ -172,7 +174,7 @@ contract ERC1155CMTest is Test {
 
     function testIsApprovedForAllReturnsTrueWhenUserExplicitlyApproves() public {
         address mockValidator = address(new MockValidator());
-        
+
         vm.prank(owner);
         token.setTransferValidator(mockValidator);
 
@@ -184,7 +186,7 @@ contract ERC1155CMTest is Test {
 
     function testIsApprovedForAllReturnsFalseForNonValidatorOperator() public {
         address mockValidator = address(new MockValidator());
-        
+
         vm.startPrank(owner);
         token.setTransferValidator(mockValidator);
         token.setAutomaticApprovalOfTransfersFromValidator(true);
@@ -202,14 +204,14 @@ contract ERC1155CMTest is Test {
         // Mint token using ownerMint to avoid stage setup complexity
         vm.prank(owner);
         token.ownerMint(user, tokenId, 1);
-        
+
         assertEq(token.balanceOf(user, tokenId), 1);
 
         // Note: Transfer validation depends on the default validator's configuration
         // If the default validator has restrictions, transfers may fail
         // This test verifies the basic transfer functionality works
         // For full validator testing, see lib/creator-token-standards/test/
-        
+
         // Transfer should succeed if validator allows (or if validator is not set)
         vm.prank(user);
         try token.safeTransferFrom(user, user2, tokenId, 1, "") {
@@ -226,7 +228,7 @@ contract ERC1155CMTest is Test {
         // Mint token using ownerMint
         vm.prank(owner);
         token.ownerMint(user, tokenId, 1);
-        
+
         assertEq(token.balanceOf(user, tokenId), 1);
 
         // Transfer from self should bypass validator (user is both from and caller)
@@ -249,7 +251,7 @@ contract ERC1155CMTest is Test {
     function testRealDefaultTransferValidatorAddress() public view {
         address defaultValidator = token.getTransferValidator();
         address expectedValidator = token.DEFAULT_TRANSFER_VALIDATOR();
-        
+
         assertEq(defaultValidator, expectedValidator);
         assertEq(defaultValidator, 0x721C0078c2328597Ca70F5451ffF5A7B38D4E947);
     }
@@ -261,27 +263,27 @@ contract ERC1155CMTest is Test {
     ///      To test with the real validator, use fork mode: forge test --fork-url <RPC_URL>
     function testRealTransferValidatorIntegration() public {
         address validatorAddress = token.getTransferValidator();
-        
+
         // Verify validator address is the real DEFAULT_TRANSFER_VALIDATOR
         assertEq(validatorAddress, 0x721C0078c2328597Ca70F5451ffF5A7B38D4E947);
         assertEq(validatorAddress, token.DEFAULT_TRANSFER_VALIDATOR());
-        
+
         // Mint token to user
         vm.prank(owner);
         token.ownerMint(user, tokenId, 1);
-        
+
         assertEq(token.balanceOf(user, tokenId), 1);
-        
+
         // Check if validator has code (only works in fork mode or if validator is deployed)
         uint256 codeSize;
         assembly {
             codeSize := extcodesize(validatorAddress)
         }
-        
+
         if (codeSize > 0) {
             // Validator contract exists - test direct interaction
             ITransferValidator validator = ITransferValidator(validatorAddress);
-            
+
             // Test direct validator call
             try validator.validateTransfer(user, user, user2, tokenId, 1) {
                 // Validator call succeeded
@@ -290,11 +292,11 @@ contract ERC1155CMTest is Test {
                 // Validator call failed - expected depending on configuration
                 assertTrue(true);
             }
-            
+
             // Enable auto-approval and test transfer through ERC1155CM
             vm.prank(owner);
             token.setAutomaticApprovalOfTransfersFromValidator(true);
-            
+
             vm.prank(user);
             try token.safeTransferFrom(user, user2, tokenId, 1, "") {
                 assertEq(token.balanceOf(user2, tokenId), 1);
@@ -315,20 +317,20 @@ contract ERC1155CMTest is Test {
     /// @dev This test verifies the validator hook is properly integrated
     function testRealValidatorCalledDuringTransfer() public {
         address validatorAddress = token.getTransferValidator();
-        
+
         // Mint token to user
         vm.prank(owner);
         token.ownerMint(user, tokenId, 1);
-        
+
         assertEq(token.balanceOf(user, tokenId), 1);
-        
+
         // Enable auto-approval for validator to ensure transfers work
         vm.prank(owner);
         token.setAutomaticApprovalOfTransfersFromValidator(true);
-        
+
         // Verify validator is approved
         assertTrue(token.isApprovedForAll(user, validatorAddress));
-        
+
         // Attempt transfer - validator should be called
         // If validator allows (Level 1) or user is transferring from self, it should succeed
         vm.prank(user);
@@ -349,45 +351,45 @@ contract ERC1155CMTest is Test {
     /// @dev Note: To test with real validator contract, use fork mode: forge test --fork-url <RPC_URL>
     function testRealValidatorPolicyEnforcement() public {
         address validatorAddress = token.getTransferValidator();
-        
+
         // Verify we're using the real DEFAULT_TRANSFER_VALIDATOR address
         assertEq(validatorAddress, 0x721C0078c2328597Ca70F5451ffF5A7B38D4E947);
-        
+
         // Mint tokens to multiple users
         vm.prank(owner);
         token.ownerMint(user, tokenId, 1);
-        
+
         vm.prank(owner);
         token.ownerMint(user2, tokenId, 1);
-        
+
         assertEq(token.balanceOf(user, tokenId), 1);
         assertEq(token.balanceOf(user2, tokenId), 1);
-        
+
         // Enable auto-approval for validator
         vm.prank(owner);
         token.setAutomaticApprovalOfTransfersFromValidator(true);
-        
+
         // Verify auto-approval is enabled
         assertTrue(token.autoApproveTransfersFromValidator());
         assertTrue(token.isApprovedForAll(user, validatorAddress));
-        
+
         // Check if validator has code (only works in fork mode)
         uint256 codeSize;
         assembly {
             codeSize := extcodesize(validatorAddress)
         }
-        
+
         if (codeSize > 0) {
             // Validator contract exists - test interaction
             ITransferValidator validator = ITransferValidator(validatorAddress);
-            
+
             // Test direct validator call
             try validator.validateTransfer(user, user, address(0x3333), tokenId, 1) {
                 assertTrue(true);
             } catch {
                 assertTrue(true);
             }
-            
+
             // Test transfer through ERC1155CM
             vm.prank(user);
             try token.safeTransferFrom(user, address(0x3333), tokenId, 1, "") {
@@ -404,11 +406,11 @@ contract ERC1155CMTest is Test {
             assertTrue(true);
         }
     }
-
 }
 
 // Mock validator contract for testing
 contract MockValidator {
     // Empty contract with code to pass validation checks
-}
+
+    }
 

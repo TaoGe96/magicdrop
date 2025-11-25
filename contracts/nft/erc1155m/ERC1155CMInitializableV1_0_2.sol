@@ -4,8 +4,9 @@ pragma solidity ^0.8.22;
 
 import {ERC1155MInitializableV1_0_2} from "./ERC1155MInitializableV1_0_2.sol";
 import {CreatorTokenBase} from "@limitbreak/creator-token-standards/src/utils/CreatorTokenBase.sol";
-import {AutomaticValidatorTransferApproval} from
-    "@limitbreak/creator-token-standards/src/utils/AutomaticValidatorTransferApproval.sol";
+import {
+    AutomaticValidatorTransferApproval
+} from "@limitbreak/creator-token-standards/src/utils/AutomaticValidatorTransferApproval.sol";
 import {ICreatorToken} from "@limitbreak/creator-token-standards/src/interfaces/ICreatorToken.sol";
 import {ContextUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
 import {Context} from "@openzeppelin/contracts/utils/Context.sol";
