@@ -452,4 +452,56 @@ export class ContractManager {
       throw error;
     }
   }
+
+  /**
+   * Gets the current mint fee for a contract.
+   * This feature is only available for contract version >= 1.0.2
+   * @param contractAddress The address of the contract.
+   * @returns The current mint fee in wei
+   */
+  public async getMintFee(contractAddress: Hex): Promise<bigint> {
+    try {
+      const getMintFeeAbi = {
+        inputs: [],
+        name: 'getMintFee',
+        outputs: [
+          {
+            internalType: 'uint256',
+            name: '',
+            type: 'uint256',
+          },
+        ],
+        stateMutability: 'view',
+        type: 'function',
+      } as const;
+
+      const data = encodeFunctionData({
+        abi: [getMintFeeAbi],
+        functionName: 'getMintFee',
+        args: [],
+      });
+
+      const result = await this.client.call({
+        to: contractAddress,
+        data,
+      });
+
+      if (!result.data) {
+        throw new Error('No data returned from getMintFee call');
+      }
+
+      const mintFee = decodeFunctionResult({
+        abi: [getMintFeeAbi],
+        functionName: 'getMintFee',
+        data: result.data,
+      });
+
+      return mintFee;
+    } catch (error: any) {
+      console.error('Error getting mint fee:', error.message);
+      throw new Error(
+        'Failed to get mint fee. This feature is only available for contract version >= 1.0.2',
+      );
+    }
+  }
 }

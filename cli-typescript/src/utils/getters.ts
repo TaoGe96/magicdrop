@@ -13,9 +13,12 @@ import {
   LIMITBREAK_TRANSFER_VALIDATOR_V3,
   LIMITBREAK_TRANSFER_VALIDATOR_V3_ABSTRACT,
   LIMITBREAK_TRANSFER_VALIDATOR_V3_BERACHAIN,
+  LIMITBREAK_TRANSFER_VALIDATOR_V5,
   MAGIC_EDEN_DEFAULT_LIST_ID,
   MAGIC_EDEN_POLYGON_LIST_ID,
   ME_TRANSFER_VALIDATOR_V3,
+  MONAD_FACTORY_ADDRESS,
+  MONAD_REGISTRY_ADDRESS,
   SUPPORTED_CHAINS,
   supportedChainNames,
   TOKEN_STANDARD,
@@ -36,7 +39,21 @@ import {
 } from 'viem/chains';
 import { Hex } from 'viem';
 import { setBaseDir } from './setters';
-import { monad } from '../cmds/networks';
+import { defineChain } from 'viem';
+
+export const monad = defineChain({
+  id: 143,
+  name: 'Monad',
+  nativeCurrency: { name: 'MON', symbol: 'MON', decimals: 18 },
+  rpcUrls: {
+    default: {
+      http: ['https://evm-router.magiceden.io/monad/mainnet/me2024'],
+    },
+  },
+  blockExplorers: {
+    default: { name: 'MonadVision', url: 'https://monadvision.com' },
+  },
+});
 
 /**
  * Retrieves the transfer validator address based on the network (chain ID).
@@ -61,9 +78,23 @@ export const getTransferValidatorAddress = (chainId: SUPPORTED_CHAINS): Hex => {
     case SUPPORTED_CHAINS.BERACHAIN:
       return LIMITBREAK_TRANSFER_VALIDATOR_V3_BERACHAIN;
 
+    case SUPPORTED_CHAINS.MONAD:
+      return LIMITBREAK_TRANSFER_VALIDATOR_V5;
+
     default:
       return LIMITBREAK_TRANSFER_VALIDATOR_V3;
   }
+};
+
+/**
+ * Check if the transfer validator address is V5.
+ * @param address The transfer validator address.
+ * @returns True if the address is V5, false otherwise.
+ */
+export const isTransferValidatorV5 = (address: Hex): boolean => {
+  return (
+    address.toLowerCase() === LIMITBREAK_TRANSFER_VALIDATOR_V5.toLowerCase()
+  );
 };
 
 export const getZksyncFlag = (chainId: SUPPORTED_CHAINS): string => {
@@ -236,6 +267,10 @@ export const getFactoryAddress = (chainId: SUPPORTED_CHAINS): `0x${string}` => {
     return AVALANCHE_FACTORY_ADDRESS;
   }
 
+  if (chainId === SUPPORTED_CHAINS.MONAD) {
+    return MONAD_FACTORY_ADDRESS;
+  }
+
   return DEFAULT_FACTORY_ADDRESS;
 };
 
@@ -248,6 +283,10 @@ export const getRegistryAddress = (
 
   if (chainId === SUPPORTED_CHAINS.AVALANCHE) {
     return AVALANCHE_REGISTRY_ADDRESS;
+  }
+
+  if (chainId === SUPPORTED_CHAINS.MONAD) {
+    return MONAD_REGISTRY_ADDRESS;
   }
 
   return DEFAULT_REGISTRY_ADDRESS;
@@ -280,6 +319,8 @@ export const getImplId = (
       return 5;
     case SUPPORTED_CHAINS.AVALANCHE:
       return 6;
+    case SUPPORTED_CHAINS.MONAD:
+      return 2;
     default:
       return 8;
   }

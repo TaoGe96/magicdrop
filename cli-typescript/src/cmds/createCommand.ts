@@ -27,6 +27,7 @@ import {
   setGlobalWalletLimitCmd,
   setMaxMintableSupplyCmd,
   setMintableCmd,
+  setMintFeeCmd,
   setStagesCmd,
   setTimestampExpiryCmd,
   setTokenURISuffixCmd,
@@ -207,6 +208,7 @@ export const createEvmCommand = ({
   newCmd.addCommand(setStagesCmd());
   newCmd.addCommand(setGlobalWalletLimitCmd());
   newCmd.addCommand(setMaxMintableSupplyCmd());
+  newCmd.addCommand(setMintFeeCmd());
   newCmd.addCommand(setCosginerCmd());
   newCmd.addCommand(setTimestampExpiryCmd());
   newCmd.addCommand(withdrawContractBalanceCmd());
