@@ -12,6 +12,7 @@ export const SET_TRANSFER_VALIDATOR_ABI = {
   type: 'function',
 } as const;
 
+// Transfer Validator V3 ABI (uses uint120)
 export const APPLY_LIST_TO_COLLECTION_ABI = {
   inputs: [
     {
@@ -23,6 +24,26 @@ export const APPLY_LIST_TO_COLLECTION_ABI = {
       internalType: 'uint120',
       name: 'id',
       type: 'uint120',
+    },
+  ],
+  name: 'applyListToCollection',
+  outputs: [],
+  stateMutability: 'nonpayable',
+  type: 'function',
+} as const;
+
+// Transfer Validator V5 ABI (uses uint48)
+export const APPLY_LIST_TO_COLLECTION_ABI_V5 = {
+  inputs: [
+    {
+      internalType: 'address',
+      name: 'collection',
+      type: 'address',
+    },
+    {
+      internalType: 'uint48',
+      name: 'id',
+      type: 'uint48',
     },
   ],
   name: 'applyListToCollection',
@@ -65,16 +86,32 @@ export const SUPPORTS_INTERFACE_ABI = {
   ],
 } as const;
 
+// Legacy event (version 1.0.0, 1.0.1)
+export const NEW_CONTRACT_INITIALIZED_EVENT_ABI_LEGACY = {
+  name: 'NewContractInitialized',
+  type: 'event',
+  inputs: [
+    { name: 'contractAddress', type: 'address', indexed: false },
+    { name: 'creator', type: 'address', indexed: false },
+    { name: 'implId', type: 'uint32', indexed: false },
+    { name: 'standardId', type: 'uint8', indexed: false },
+    { name: 'name', type: 'string', indexed: false },
+    { name: 'symbol', type: 'string', indexed: false },
+  ],
+} as const;
+
+// New event (version >= 1.0.2) - includes an additional uint256 parameter
 export const NEW_CONTRACT_INITIALIZED_EVENT_ABI = {
   name: 'NewContractInitialized',
   type: 'event',
   inputs: [
-    { name: 'contractAddress', type: 'address' },
-    { name: 'creator', type: 'address' },
-    { name: 'implId', type: 'uint32' },
-    { name: 'standardId', type: 'uint8' },
-    { name: 'name', type: 'string' },
-    { name: 'symbol', type: 'string' },
+    { name: 'contractAddress', type: 'address', indexed: false },
+    { name: 'creator', type: 'address', indexed: false },
+    { name: 'implId', type: 'uint32', indexed: false },
+    { name: 'standardId', type: 'uint8', indexed: false },
+    { name: 'name', type: 'string', indexed: false },
+    { name: 'symbol', type: 'string', indexed: false },
+    { name: 'version', type: 'uint256', indexed: false },
   ],
 } as const;
 
@@ -258,7 +295,8 @@ export const ERC712M_ABIS = {
     stateMutability: 'nonpayable',
     type: 'function',
   },
-  setStages: {
+  // Legacy ABI (version 1.0.0, 1.0.1) - includes mintFee field
+  setStagesLegacy: {
     inputs: [
       {
         components: [
@@ -270,6 +308,52 @@ export const ERC712M_ABIS = {
           {
             internalType: 'uint80',
             name: 'mintFee',
+            type: 'uint80',
+          },
+          {
+            internalType: 'uint32',
+            name: 'walletLimit',
+            type: 'uint32',
+          },
+          {
+            internalType: 'bytes32',
+            name: 'merkleRoot',
+            type: 'bytes32',
+          },
+          {
+            internalType: 'uint24',
+            name: 'maxStageSupply',
+            type: 'uint24',
+          },
+          {
+            internalType: 'uint256',
+            name: 'startTimeUnixSeconds',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'endTimeUnixSeconds',
+            type: 'uint256',
+          },
+        ],
+        internalType: 'struct IERC721M.MintStageInfo[]',
+        name: 'newStages',
+        type: 'tuple[]',
+      },
+    ],
+    name: 'setStages',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  // New ABI (version >= 1.0.2) - no mintFee field
+  setStages: {
+    inputs: [
+      {
+        components: [
+          {
+            internalType: 'uint80',
+            name: 'price',
             type: 'uint80',
           },
           {
@@ -503,7 +587,8 @@ export const ERC1155M_ABIS = {
     stateMutability: 'nonpayable',
     type: 'function',
   },
-  setStages: {
+  // Legacy ABI (version 1.0.0, 1.0.1) - includes mintFee field
+  setStagesLegacy: {
     inputs: [
       {
         components: [
@@ -515,6 +600,52 @@ export const ERC1155M_ABIS = {
           {
             internalType: 'uint80[]',
             name: 'mintFee',
+            type: 'uint80[]',
+          },
+          {
+            internalType: 'uint32[]',
+            name: 'walletLimit',
+            type: 'uint32[]',
+          },
+          {
+            internalType: 'bytes32[]',
+            name: 'merkleRoot',
+            type: 'bytes32[]',
+          },
+          {
+            internalType: 'uint24[]',
+            name: 'maxStageSupply',
+            type: 'uint24[]',
+          },
+          {
+            internalType: 'uint256',
+            name: 'startTimeUnixSeconds',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'endTimeUnixSeconds',
+            type: 'uint256',
+          },
+        ],
+        internalType: 'struct IERC1155M.MintStageInfo[]',
+        name: 'newStages',
+        type: 'tuple[]',
+      },
+    ],
+    name: 'setStages',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  // New ABI (version >= 1.0.2) - no mintFee field
+  setStages: {
+    inputs: [
+      {
+        components: [
+          {
+            internalType: 'uint80[]',
+            name: 'price',
             type: 'uint80[]',
           },
           {

@@ -16,6 +16,7 @@ import {
   getTransferValidatorAddress,
   getTransferValidatorListId,
   getViemChainByChainId,
+  isTransferValidatorV5,
 } from './getters';
 import {
   ICREATOR_TOKEN_INTERFACE_ID,
@@ -25,10 +26,12 @@ import {
 import { collapseAddress, isValidEthereumAddress } from './common';
 import {
   APPLY_LIST_TO_COLLECTION_ABI,
+  APPLY_LIST_TO_COLLECTION_ABI_V5,
   IS_SETUP_LOCKED_ABI,
   MagicDropCloneFactoryAbis,
   MagicDropTokenImplRegistryAbis,
   NEW_CONTRACT_INITIALIZED_EVENT_ABI,
+  NEW_CONTRACT_INITIALIZED_EVENT_ABI_LEGACY,
   SET_TRANSFER_VALIDATOR_ABI,
   SET_TRANSFERABLE_ABI,
   SUPPORTS_INTERFACE_ABI,
@@ -204,31 +207,48 @@ export class ContractManager {
 
   static getContractAddressFromLogs(logs: TransactionReceipt['logs']) {
     try {
-      // Generate the event selector from the event ABI
+      // Try the new event format first (version >= 1.0.2)
       const eventSelector = toEventSelector(
         NEW_CONTRACT_INITIALIZED_EVENT_ABI,
       ) as Hex;
 
-      // Find the log that matches the event signature
-      const log = logs.find((log) =>
+      let log = logs.find((log) =>
         (log.topics as Hex[]).includes(eventSelector),
       );
 
+      let eventAbi:
+        | typeof NEW_CONTRACT_INITIALIZED_EVENT_ABI
+        | typeof NEW_CONTRACT_INITIALIZED_EVENT_ABI_LEGACY =
+        NEW_CONTRACT_INITIALIZED_EVENT_ABI;
+
+      // If not found, try the legacy event format (version 1.0.0, 1.0.1)
+      if (!log) {
+        const legacyEventSelector = toEventSelector(
+          NEW_CONTRACT_INITIALIZED_EVENT_ABI_LEGACY,
+        ) as Hex;
+
+        log = logs.find((log) =>
+          (log.topics as Hex[]).includes(legacyEventSelector),
+        );
+
+        eventAbi = NEW_CONTRACT_INITIALIZED_EVENT_ABI_LEGACY;
+      }
+
       if (!log) {
         throw new Error(
-          'No matching log found for NewContractInitialized event.',
+          'No matching log found for NewContractInitialized event (tried both new and legacy formats).',
         );
       }
 
-      // Decode the event log
+      // Decode the event log with type assertion to handle union type
       const decodedLog = decodeEventLog({
-        abi: [NEW_CONTRACT_INITIALIZED_EVENT_ABI],
+        abi: [eventAbi] as any,
         data: log.data,
         topics: log.topics,
-      });
+      }) as any;
 
       // Extract the contract address
-      const contractAddress = (decodedLog.args as any).contractAddress;
+      const contractAddress = decodedLog.args?.contractAddress as Hex | undefined;
 
       if (!contractAddress) {
         throw new Error('Contract address not found in decoded log.');
@@ -363,9 +383,15 @@ export class ContractManager {
       // Get the transfer validator address
       const tfAddress = getTransferValidatorAddress(this.chainId) as Hex;
 
+      // Check if using Transfer Validator V5 (uses uint48 instead of uint120)
+      const isV5 = isTransferValidatorV5(tfAddress);
+      const abi = isV5
+        ? APPLY_LIST_TO_COLLECTION_ABI_V5
+        : APPLY_LIST_TO_COLLECTION_ABI;
+
       const data = encodeFunctionData({
-        abi: [APPLY_LIST_TO_COLLECTION_ABI],
-        functionName: APPLY_LIST_TO_COLLECTION_ABI.name,
+        abi: [abi],
+        functionName: abi.name,
         args: [contractAddress, BigInt(tfListId)],
       });
 
@@ -502,6 +528,66 @@ export class ContractManager {
       throw new Error(
         'Failed to get mint fee. This feature is only available for contract version >= 1.0.2',
       );
+    }
+  }
+
+  /**
+   * Gets the contract name and version from the deployed contract.
+   * @param contractAddress The address of the contract.
+   * @returns An object containing contract name and version, or undefined if the call fails
+   */
+  public async getContractVersion(
+    contractAddress: Hex,
+  ): Promise<{ name: string; version: string } | undefined> {
+    try {
+      const contractNameAndVersionAbi = {
+        inputs: [],
+        name: 'contractNameAndVersion',
+        outputs: [
+          {
+            internalType: 'string',
+            name: '',
+            type: 'string',
+          },
+          {
+            internalType: 'string',
+            name: '',
+            type: 'string',
+          },
+        ],
+        stateMutability: 'view',
+        type: 'function',
+      } as const;
+
+      const data = encodeFunctionData({
+        abi: [contractNameAndVersionAbi],
+        functionName: 'contractNameAndVersion',
+        args: [],
+      });
+
+      const result = await this.client.call({
+        to: contractAddress,
+        data,
+      });
+
+      if (!result.data) {
+        console.warn('No data returned from contractNameAndVersion call');
+        return undefined;
+      }
+
+      const [name, version] = decodeFunctionResult({
+        abi: [contractNameAndVersionAbi],
+        functionName: 'contractNameAndVersion',
+        data: result.data,
+      }) as [string, string];
+
+      return { name, version };
+    } catch (error: any) {
+      console.warn(
+        'Could not get contract version, assuming legacy contract:',
+        error.message,
+      );
+      return undefined;
     }
   }
 }
