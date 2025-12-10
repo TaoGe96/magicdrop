@@ -36,7 +36,22 @@ import {
 } from 'viem/chains';
 import { Hex } from 'viem';
 import { setBaseDir } from './setters';
+import { defineChain } from 'viem';
 import { monad } from '../cmds/networks';
+
+export const megaeth = defineChain({
+  id: 4326,
+  name: 'MegaETH',
+  nativeCurrency: { name: 'MEGA', symbol: 'MEGA', decimals: 18 },
+  rpcUrls: {
+    default: {
+      http: ['https://evm-router.magiceden.io/megaeth/mainnet/me2024'],
+    },
+  },
+  blockExplorers: {
+    default: { name: 'MegaETH Explorer', url: 'https://TBD' },
+  },
+});
 
 /**
  * Retrieves the transfer validator address based on the network (chain ID).
@@ -98,6 +113,8 @@ export const getSymbolFromChainId = (chainId: SUPPORTED_CHAINS): string => {
       return 'MON';
     case SUPPORTED_CHAINS.AVALANCHE:
       return 'AVAX';
+    case SUPPORTED_CHAINS.MEGAETH:
+      return 'MEGA';
     default:
       return 'Unknown';
   }
@@ -149,14 +166,12 @@ export const getViemChainByChainId = (chainId: SUPPORTED_CHAINS) => {
       return berachain;
     case SUPPORTED_CHAINS.SEPOLIA:
       return sepolia;
-    case SUPPORTED_CHAINS.ARBITRUM:
-      return arbitrum;
     case SUPPORTED_CHAINS.ABSTRACT:
       return abstract;
-    case SUPPORTED_CHAINS.MONAD:
-      return monad;
-    case SUPPORTED_CHAINS.AVALANCHE:
-      return avalanche;
+    // case SUPPORTED_CHAINS.MONAD:
+    //   return monad;
+    case SUPPORTED_CHAINS.MEGAETH:
+      return megaeth;
     default:
       throw new Error(`Unsupported chain ID: ${chainId}`);
   }
