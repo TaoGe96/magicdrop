@@ -24,6 +24,8 @@ import { ContractManager } from './ContractManager';
 import { Hex } from 'viem';
 import {
   DEFAULT_MINT_CURRENCY,
+  LEGACY_SETUP_SIGNATURE,
+  SETUP_SIGNATURE,
   SUPPORTED_CHAINS,
   TOKEN_STANDARD,
 } from './constants';
@@ -399,7 +401,8 @@ export const getERC721ParsedStagesData = (
 ) => {
   if (isLegacy) {
     // Legacy format includes mintFee
-    const parsedStagesData = stagesData.map((stage) => {
+
+    return stagesData.map((stage) => {
       return [
         BigInt(stage.price),
         BigInt(stage.mintFee || 0),
@@ -410,11 +413,10 @@ export const getERC721ParsedStagesData = (
         BigInt(stage.endTime),
       ] as readonly [bigint, bigint, number, Hex, number, bigint, bigint];
     });
-
-    return parsedStagesData;
   } else {
     // New format without mintFee
-    const parsedStagesData = stagesData.map((stage) => {
+
+    return stagesData.map((stage) => {
       return [
         BigInt(stage.price),
         stage.walletLimit,
@@ -424,8 +426,6 @@ export const getERC721ParsedStagesData = (
         BigInt(stage.endTime),
       ] as readonly [bigint, number, Hex, number, bigint, bigint];
     });
-
-    return parsedStagesData;
   }
 };
 
@@ -501,27 +501,52 @@ const sendERC721SetupTransaction = async ({
   isLegacy?: boolean;
 }) => {
   try {
-    // Choose setup signature based on version
-    const setupSignature = isLegacy
-      ? 'function setup(string,string,uint256,uint256,address,address,(uint80,uint80,uint32,bytes32,uint24,uint256,uint256)[],address,uint96)'
-      : 'function setup(string,string,uint256,uint256,address,address,(uint80,uint32,bytes32,uint24,uint256,uint256)[],address,uint96)';
-
-    const abi = AbiFunction.from(setupSignature);
-
     const parsedStagesData = getERC721ParsedStagesData(stagesData, isLegacy);
-    
-    // Type assertion needed because AbiFunction.encodeData cannot infer union types
-    const encodedData = AbiFunction.encodeData(abi, [
-      uri as string,
-      tokenUriSuffix as string,
-      BigInt(maxMintableSupply as number),
-      BigInt(globalWalletLimit as number),
-      mintCurrency as Hex,
-      fundReceiver as Hex,
-      parsedStagesData as any,
-      royaltyReceiver as Hex,
-      BigInt(royaltyFee),
-    ]);
+
+    let encodedData: Hex;
+
+    if (isLegacy) {
+      const abi = AbiFunction.from(LEGACY_SETUP_SIGNATURE);
+      encodedData = AbiFunction.encodeData(abi, [
+        uri,
+        tokenUriSuffix,
+        BigInt(maxMintableSupply),
+        BigInt(globalWalletLimit),
+        mintCurrency as Hex,
+        fundReceiver as Hex,
+        parsedStagesData as readonly (readonly [
+          bigint,
+          bigint,
+          number,
+          Hex,
+          number,
+          bigint,
+          bigint,
+        ])[],
+        royaltyReceiver as Hex,
+        BigInt(royaltyFee),
+      ]);
+    } else {
+      const abi = AbiFunction.from(SETUP_SIGNATURE);
+      encodedData = AbiFunction.encodeData(abi, [
+        uri,
+        tokenUriSuffix,
+        BigInt(maxMintableSupply),
+        BigInt(globalWalletLimit),
+        mintCurrency as Hex,
+        fundReceiver as Hex,
+        parsedStagesData as readonly (readonly [
+          bigint,
+          number,
+          Hex,
+          number,
+          bigint,
+          bigint,
+        ])[],
+        royaltyReceiver as Hex,
+        BigInt(royaltyFee),
+      ]);
+    }
 
     const hash = await cm.sendTransaction({
       to: contractAddress,
@@ -571,7 +596,7 @@ const sendERC1155SetupTransaction = async ({
     const abi = AbiFunction.from(setupSignature);
 
     const parsedStagesData = getERC1155ParsedStagesData(stagesData, isLegacy);
-    
+
     // Type assertion needed because AbiFunction.encodeData cannot infer union types
     const encodedData = AbiFunction.encodeData(abi, [
       uri as string,

@@ -152,3 +152,9 @@ export const DEFAULT_MERKLE_ROOT =
   '0x0000000000000000000000000000000000000000000000000000000000000000';
 
 export const STANDARD_GAS_LIMIT = 21000; // Standard gas limit for native transfers
+
+// Setup function signatures for ERC721 contracts
+export const LEGACY_SETUP_SIGNATURE =
+  'function setup(string,string,uint256,uint256,address,address,(uint80,uint80,uint32,bytes32,uint24,uint256,uint256)[],address,uint96)';
+export const SETUP_SIGNATURE =
+  'function setup(string,string,uint256,uint256,address,address,(uint80,uint32,bytes32,uint24,uint256,uint256)[],address,uint96)';

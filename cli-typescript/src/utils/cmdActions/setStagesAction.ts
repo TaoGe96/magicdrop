@@ -48,20 +48,14 @@ export const setStagesAction = async (
       txHash = await sendERC721StagesTransaction(
         cm,
         contractAddress,
-        getERC721ParsedStagesData(
-          stagesData as ERC721StageData[],
-          isLegacy,
-        ),
+        getERC721ParsedStagesData(stagesData as ERC721StageData[], isLegacy),
         isLegacy,
       );
     } else if (config.tokenStandard === TOKEN_STANDARD.ERC1155) {
       txHash = await sendERC1155SetupTransaction(
         cm,
         contractAddress,
-        getERC1155ParsedStagesData(
-          stagesData as ERC1155StageData[],
-          isLegacy,
-        ),
+        getERC1155ParsedStagesData(stagesData as ERC1155StageData[], isLegacy),
         isLegacy,
       );
     } else {

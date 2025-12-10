@@ -36,24 +36,10 @@ import {
   polygon,
   sei,
   sepolia,
+  monad,
 } from 'viem/chains';
 import { Hex } from 'viem';
 import { setBaseDir } from './setters';
-import { defineChain } from 'viem';
-
-export const monad = defineChain({
-  id: 143,
-  name: 'Monad',
-  nativeCurrency: { name: 'MON', symbol: 'MON', decimals: 18 },
-  rpcUrls: {
-    default: {
-      http: ['https://evm-router.magiceden.io/monad/mainnet/me2024'],
-    },
-  },
-  blockExplorers: {
-    default: { name: 'MonadVision', url: 'https://monadvision.com' },
-  },
-});
 
 /**
  * Retrieves the transfer validator address based on the network (chain ID).
