@@ -87,6 +87,7 @@ export enum SUPPORTED_CHAINS {
   ABSTRACT = 2741,
   BERACHAIN = 80094,
   MONAD = 143,
+  MEGAETH = 4326,
 }
 
 export const supportedChainNames: { [key in SUPPORTED_CHAINS]: string } = {
@@ -102,6 +103,7 @@ export const supportedChainNames: { [key in SUPPORTED_CHAINS]: string } = {
   [SUPPORTED_CHAINS.ABSTRACT]: 'abstract',
   [SUPPORTED_CHAINS.BERACHAIN]: 'berachain',
   [SUPPORTED_CHAINS.MONAD]: 'monad',
+  [SUPPORTED_CHAINS.MEGAETH]: 'megaeth',
 };
 
 export const rpcUrls: { [chainId in SUPPORTED_CHAINS]: string } = {
@@ -127,6 +129,8 @@ export const rpcUrls: { [chainId in SUPPORTED_CHAINS]: string } = {
     'https://evm-router.magiceden.io/monad/mainnet/me2024', // Monad
   [SUPPORTED_CHAINS.AVALANCHE]:
     'https://evm-router.magiceden.io/avalanche/mainnet/me2024', // Avalanche
+  [SUPPORTED_CHAINS.MEGAETH]:
+    'https://evm-router.magiceden.io/megaeth/mainnet/me2024', // MegaETH
 };
 
 export const explorerUrls: { [chainId in SUPPORTED_CHAINS]: string } = {
@@ -142,6 +146,7 @@ export const explorerUrls: { [chainId in SUPPORTED_CHAINS]: string } = {
   [SUPPORTED_CHAINS.BERACHAIN]: 'https://berascan.com', // Berachain
   [SUPPORTED_CHAINS.MONAD]: 'https://monadvision.com', // Monad
   [SUPPORTED_CHAINS.AVALANCHE]: 'https://snowtrace.io', // Avalanche
+  [SUPPORTED_CHAINS.MEGAETH]: 'https://TBD', // MegaETH
 };
 
 export const DEFAULT_TOKEN_URI_SUFFIX = '.json';
