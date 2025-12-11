@@ -162,3 +162,9 @@ export const getConfigFileOption = () =>
     Path to the project configuration file. This file contains the config for the collection.
   `,
   );
+
+export const getMintFeeOption = () =>
+  new Option(
+    '--mintFee <mintFee>',
+    'Specify the mint fee in ETH (e.g., 0.001 for 0.001 ETH). This feature is only available for contract version >= 1.0.2',
+  );
