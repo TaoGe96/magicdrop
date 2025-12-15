@@ -148,11 +148,6 @@ const config: HardhatUserConfig = {
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
-    megaeth: {
-      url: process.env.MEGAETH_URL || 'https://evm-router.magiceden.io/megaeth/mainnet/me2024',
-      accounts:
-        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
-    },
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,
@@ -191,14 +186,6 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: 'https://sui-mainnet.blockvision.org/v1/355Jy1f4IF9O27RHJOJcg1EUAF3',
           browserURL: 'https://monadvision.com'
-        },
-      },
-      {
-        network: 'megaeth',
-        chainId: 4326,
-        urls: {
-          apiURL: 'https://TBD',
-          browserURL: 'https://TBD'
         },
       },
     ]
