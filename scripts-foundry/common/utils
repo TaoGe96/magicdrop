@@ -14,6 +14,7 @@ set_rpc_url() {
         80094) RPC_URL="https://rpc.berachain.com" ;; # Berachain
         2741) RPC_URL="https://api.mainnet.abs.xyz" ;; # Abstract
         143) RPC_URL="https://evm-router.magiceden.io/monad/mainnet/me2024" ;; # Monad
+        4326) RPC_URL="https://evm-router.magiceden.io/megaeth/mainnet/me2024" ;; # MegaETH
         *) echo "Unsupported chain id"; exit 1 ;;
     esac
 
@@ -35,6 +36,7 @@ set_etherscan_api_key() {
       2741) ETHERSCAN_API_KEY=$VERIFICATION_API_KEY_ABSTRACT ;;
       43114) ETHERSCAN_API_KEY=$VERIFICATION_API_KEY_AVALANCHE ;;
       143) ETHERSCAN_API_KEY=$VERIFICATION_API_KEY_MONAD ;;
+      4326) ETHERSCAN_API_KEY=$VERIFICATION_API_KEY_MEGAETH ;; # MegaETH
       *) echo "Unsupported chain id"; exit 1 ;;
   esac
 
