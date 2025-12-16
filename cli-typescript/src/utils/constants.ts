@@ -43,6 +43,8 @@ export const MONAD_FACTORY_ADDRESS =
   '0x00000000bEa935F8315156894Aa4a45D3c7a0075';
 export const DEFAULT_FACTORY_ADDRESS =
   '0x000000009e44eBa131196847C685F20Cd4b68aC4';
+export const MEGAETH_FACTORY_ADDRESS =
+  '0x00000000bEa935F8315156894Aa4a45D3c7a0075';
 
 export const ABSTRACT_REGISTRY_ADDRESS =
   '0x9b60ad31F145ec7EE3c559153bB57928B65C0F87';
@@ -52,6 +54,8 @@ export const MONAD_REGISTRY_ADDRESS =
   '0x000000000e447e71b2EC36CD62048Dd2a1Cd0a57';
 export const DEFAULT_REGISTRY_ADDRESS =
   '0x00000000caF1E3978e291c5Fb53FeedB957eC146';
+export const MEGAETH_REGISTRY_ADDRESS =
+  '0x000000000e447e71b2EC36CD62048Dd2a1Cd0a57';
 
 export const ICREATOR_TOKEN_INTERFACE_ID = '0xad0d7f6c'; // type(ICreatorToken).interfaceId
 export const TRUE_HEX =
@@ -83,6 +87,7 @@ export enum SUPPORTED_CHAINS {
   ABSTRACT = 2741,
   BERACHAIN = 80094,
   MONAD = 143,
+  MEGAETH = 4326,
 }
 
 export const supportedChainNames: { [key in SUPPORTED_CHAINS]: string } = {
@@ -98,6 +103,7 @@ export const supportedChainNames: { [key in SUPPORTED_CHAINS]: string } = {
   [SUPPORTED_CHAINS.ABSTRACT]: 'abstract',
   [SUPPORTED_CHAINS.BERACHAIN]: 'berachain',
   [SUPPORTED_CHAINS.MONAD]: 'monad',
+  [SUPPORTED_CHAINS.MEGAETH]: 'megaeth',
 };
 
 export const rpcUrls: { [chainId in SUPPORTED_CHAINS]: string } = {
@@ -123,6 +129,8 @@ export const rpcUrls: { [chainId in SUPPORTED_CHAINS]: string } = {
     'https://evm-router.magiceden.io/monad/mainnet/me2024', // Monad
   [SUPPORTED_CHAINS.AVALANCHE]:
     'https://evm-router.magiceden.io/avalanche/mainnet/me2024', // Avalanche
+  [SUPPORTED_CHAINS.MEGAETH]:
+    'https://evm-router.magiceden.io/megaeth/mainnet/me2024', // MegaETH
 };
 
 export const explorerUrls: { [chainId in SUPPORTED_CHAINS]: string } = {
@@ -138,6 +146,7 @@ export const explorerUrls: { [chainId in SUPPORTED_CHAINS]: string } = {
   [SUPPORTED_CHAINS.BERACHAIN]: 'https://berascan.com', // Berachain
   [SUPPORTED_CHAINS.MONAD]: 'https://monadvision.com', // Monad
   [SUPPORTED_CHAINS.AVALANCHE]: 'https://snowtrace.io', // Avalanche
+  [SUPPORTED_CHAINS.MEGAETH]: 'https://TBD', // MegaETH
 };
 
 export const DEFAULT_TOKEN_URI_SUFFIX = '.json';
