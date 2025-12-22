@@ -45,7 +45,6 @@ contract ERC1155MInitializableV1_0_2 is
     /// @param mintFee The mint fee for the contract
     function initialize(string calldata name_, string calldata symbol_, address initialOwner, uint256 mintFee)
         external
-        virtual
         initializer
     {
         if (initialOwner == address(0)) {
@@ -65,7 +64,7 @@ contract ERC1155MInitializableV1_0_2 is
 
     /// @notice Returns the contract name and version
     /// @return The contract name and version as strings
-    function contractNameAndVersion() public pure virtual returns (string memory, string memory) {
+    function contractNameAndVersion() public pure returns (string memory, string memory) {
         return ("ERC1155MInitializable", "1.0.2");
     }
 

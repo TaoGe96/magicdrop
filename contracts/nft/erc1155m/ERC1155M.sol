@@ -76,7 +76,7 @@ contract ERC1155M is
 
     /// @notice Returns the contract name and version
     /// @return The contract name and version as strings
-    function contractNameAndVersion() public pure virtual returns (string memory, string memory) {
+    function contractNameAndVersion() public pure returns (string memory, string memory) {
         return ("ERC1155M", "1.0.0");
     }
 
