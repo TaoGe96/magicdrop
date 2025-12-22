@@ -119,11 +119,7 @@ contract ERC1155CMInitializableV1_0_2 is
     /// @param qty The quantity to mint
     /// @param limit The minting limit for the caller (used in merkle proofs)
     /// @param proof The merkle proof for allowlist minting
-    function mint(uint256 tokenId, uint32 qty, uint32 limit, bytes32[] calldata proof)
-        external
-        payable
-        nonReentrant
-    {
+    function mint(uint256 tokenId, uint32 qty, uint32 limit, bytes32[] calldata proof) external payable nonReentrant {
         _mintInternal(msg.sender, tokenId, qty, limit, proof);
     }
 

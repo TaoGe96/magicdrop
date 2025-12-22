@@ -208,16 +208,16 @@ contract ERC1155CMInitializableTest is Test {
     function testSetTransferValidator() public {
         // Deploy a mock validator with code
         address mockValidator = address(new MockTransferValidator());
-        
+
         vm.prank(owner);
         nft.setTransferValidator(mockValidator);
-        
+
         assertEq(nft.getTransferValidator(), mockValidator);
     }
 
     function testSetTransferValidatorNonOwnerRevert() public {
         address mockValidator = address(new MockTransferValidator());
-        
+
         vm.prank(minter);
         vm.expectRevert(Ownable.Unauthorized.selector);
         nft.setTransferValidator(mockValidator);
@@ -226,7 +226,7 @@ contract ERC1155CMInitializableTest is Test {
     function testSetTransferValidatorZeroAddress() public {
         vm.prank(owner);
         nft.setTransferValidator(address(0));
-        
+
         // After setting to zero, validator should be zero (no validator)
         assertEq(nft.getTransferValidator(), address(0));
     }
@@ -245,14 +245,14 @@ contract ERC1155CMInitializableTest is Test {
 
     function testAutoApproveTransfersFromValidator() public {
         address mockValidator = address(new MockTransferValidator());
-        
+
         vm.prank(owner);
         nft.setTransferValidator(mockValidator);
-        
+
         // Mint a token to minter
         vm.prank(owner);
         nft.ownerMint(minter, 0, 1);
-        
+
         // The validator should be auto-approved if autoApproveTransfersFromValidator is true
         // Note: This depends on the AutomaticValidatorTransferApproval implementation
         // The approval depends on the autoApproveTransfersFromValidator flag
@@ -265,7 +265,7 @@ contract ERC1155CMInitializableTest is Test {
         ERC1155CMInitializable nftMulti =
             ERC1155CMInitializable(LibClone.deployERC1967(address(new ERC1155CMInitializable())));
         nftMulti.initialize("Test", "TEST", owner, mintFee);
-        
+
         // Deploy and set a mock transfer validator
         address mockValidator = address(new MockTransferValidator());
         nftMulti.setTransferValidator(mockValidator);
@@ -277,9 +277,7 @@ contract ERC1155CMInitializableTest is Test {
         walletLimit[0] = GLOBAL_WALLET_LIMIT;
         walletLimit[1] = GLOBAL_WALLET_LIMIT;
 
-        nftMulti.setup(
-            "base_uri_", maxSupply, walletLimit, address(0), fundReceiver, initialStages, address(this), 0
-        );
+        nftMulti.setup("base_uri_", maxSupply, walletLimit, address(0), fundReceiver, initialStages, address(this), 0);
 
         vm.startPrank(owner);
         nftMulti.ownerMint(minter, 0, 5);
@@ -304,13 +302,13 @@ contract ERC1155CMInitializableTest is Test {
 
     function testTransferValidationIsCalledOnTransfer() public {
         MockTransferValidatorWithRevert mockValidator = new MockTransferValidatorWithRevert();
-        
+
         vm.prank(owner);
         nft.setTransferValidator(address(mockValidator));
-        
+
         vm.prank(owner);
         nft.ownerMint(minter, 0, 1);
-        
+
         // Transfer should revert because validator reverts
         vm.prank(minter);
         vm.expectRevert("MockValidator: transfer not allowed");
@@ -319,26 +317,26 @@ contract ERC1155CMInitializableTest is Test {
 
     function testMintDoesNotCallValidator() public {
         MockTransferValidatorWithRevert mockValidator = new MockTransferValidatorWithRevert();
-        
+
         vm.prank(owner);
         nft.setTransferValidator(address(mockValidator));
-        
+
         // Minting should work even though validator would revert on transfers
         vm.prank(owner);
         nft.ownerMint(minter, 0, 1);
-        
+
         assertEq(nft.balanceOf(minter, 0), 1);
     }
 
     function testBurnDoesNotCallValidator() public {
         MockTransferValidatorWithRevert mockValidator = new MockTransferValidatorWithRevert();
-        
+
         vm.prank(owner);
         nft.ownerMint(minter, 0, 1);
-        
+
         vm.prank(owner);
         nft.setTransferValidator(address(mockValidator));
-        
+
         // Burning should work even though validator would revert on transfers
         // Note: ERC1155M doesn't have a public burn function, so we can't test this directly
         // This test is here for completeness but will be skipped
@@ -349,36 +347,33 @@ contract ERC1155CMInitializableTest is Test {
 
 contract MockTransferValidator is ITransferValidator {
     function applyCollectionTransferPolicy(address caller, address from, address to) external pure override {}
-    
-    function validateTransfer(address caller, address from, address to) external pure override {}
-    
-    function validateTransfer(
-        address caller,
-        address from,
-        address to,
-        uint256 tokenId
-    ) external pure override {}
 
-    function validateTransfer(
-        address caller,
-        address from,
-        address to,
-        uint256 tokenId,
-        uint256 amount
-    ) external pure override {}
-    
+    function validateTransfer(address caller, address from, address to) external pure override {}
+
+    function validateTransfer(address caller, address from, address to, uint256 tokenId) external pure override {}
+
+    function validateTransfer(address caller, address from, address to, uint256 tokenId, uint256 amount)
+        external
+        pure
+        override
+    {}
+
     function beforeAuthorizedTransfer(address operator, address token, uint256 tokenId) external pure override {}
-    
+
     function afterAuthorizedTransfer(address token, uint256 tokenId) external pure override {}
-    
+
     function beforeAuthorizedTransfer(address operator, address token) external pure override {}
-    
+
     function afterAuthorizedTransfer(address token) external pure override {}
-    
+
     function beforeAuthorizedTransfer(address token, uint256 tokenId) external pure override {}
-    
-    function beforeAuthorizedTransferWithAmount(address token, uint256 tokenId, uint256 amount) external pure override {}
-    
+
+    function beforeAuthorizedTransferWithAmount(address token, uint256 tokenId, uint256 amount)
+        external
+        pure
+        override
+    {}
+
     function afterAuthorizedTransferWithAmount(address token, uint256 tokenId) external pure override {}
 }
 
@@ -386,42 +381,39 @@ contract MockTransferValidatorWithRevert is ITransferValidator {
     function applyCollectionTransferPolicy(address caller, address from, address to) external pure override {
         revert("MockValidator: transfer not allowed");
     }
-    
+
     function validateTransfer(address caller, address from, address to) external pure override {
         revert("MockValidator: transfer not allowed");
     }
-    
-    function validateTransfer(
-        address caller,
-        address from,
-        address to,
-        uint256 tokenId
-    ) external pure override {
+
+    function validateTransfer(address caller, address from, address to, uint256 tokenId) external pure override {
         revert("MockValidator: transfer not allowed");
     }
 
-    function validateTransfer(
-        address caller,
-        address from,
-        address to,
-        uint256 tokenId,
-        uint256 amount
-    ) external pure override {
+    function validateTransfer(address caller, address from, address to, uint256 tokenId, uint256 amount)
+        external
+        pure
+        override
+    {
         revert("MockValidator: transfer not allowed");
     }
-    
+
     function beforeAuthorizedTransfer(address operator, address token, uint256 tokenId) external pure override {}
-    
+
     function afterAuthorizedTransfer(address token, uint256 tokenId) external pure override {}
-    
+
     function beforeAuthorizedTransfer(address operator, address token) external pure override {}
-    
+
     function afterAuthorizedTransfer(address token) external pure override {}
-    
+
     function beforeAuthorizedTransfer(address token, uint256 tokenId) external pure override {}
-    
-    function beforeAuthorizedTransferWithAmount(address token, uint256 tokenId, uint256 amount) external pure override {}
-    
+
+    function beforeAuthorizedTransferWithAmount(address token, uint256 tokenId, uint256 amount)
+        external
+        pure
+        override
+    {}
+
     function afterAuthorizedTransferWithAmount(address token, uint256 tokenId) external pure override {}
 }
 
