@@ -7,6 +7,7 @@ import {
   getGlobalWalletLimitOption,
   getIsMintableOption,
   getMaxMintableSupplyOption,
+  getMintFeeOption,
   getMinterActionOption,
   getMinterOption,
   getNewOwnerOption,
@@ -37,6 +38,7 @@ import { checkSignerBalanceAction } from '../utils/cmdActions/checkSignerBalance
 import { transferSignerBalanceAction } from '../utils/cmdActions/transferSignerBalanceAction';
 import getWalletInfoAction from '../utils/cmdActions/getWalletInfoAction';
 import getProjectConfigAction from '../utils/cmdActions/getProjectConfigAction';
+import { setMintFeeAction } from '../utils/cmdActions/setMintFeeAction';
 
 export const createNewWalletCmd = () =>
   new Command('create-wallet')
@@ -65,7 +67,7 @@ export const setStagesCmd = () =>
     .command('set-stages <symbol>')
     .addOption(getStagesFileOption())
     .description(
-      `Set the stages for the collection. Note: this will overwrite the existing stages. You can provide a stages file or update the existing stages in the config.`,
+      'Set the stages for the collection. Note: this will overwrite the existing stages. You can provide a stages file or update the existing stages in the config.',
     )
     .action(setStagesAction);
 
@@ -207,3 +209,13 @@ export const transferSignerBalanceCmd = () =>
     .addOption(getReceiverOption().makeOptionMandatory())
     .addOption(getGasLimitOption().default(STANDARD_GAS_LIMIT + 6000)) // Default gas limit with buffer
     .action(transferSignerBalanceAction);
+
+export const setMintFeeCmd = () =>
+  new Command('set-mint-fee')
+    .command('set-mint-fee <symbol>')
+    .alias('smf')
+    .description(
+      'Set the mint fee for the collection. Note: this feature is only available for contract version >= 1.0.2',
+    )
+    .addOption(getMintFeeOption().makeOptionMandatory())
+    .action(setMintFeeAction);

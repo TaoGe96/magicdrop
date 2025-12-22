@@ -9,6 +9,7 @@ import {
   berachain,
   bsc,
   eth,
+  megaeth,
   monad,
   polygon,
   sei,
@@ -35,6 +36,7 @@ export const mainMenu = async () => {
   program.addCommand(arbitrum);
   program.addCommand(abstract);
   program.addCommand(avalanche);
+  program.addCommand(megaeth);
   program.addCommand(monad);
 
   await program.parseAsync(process.argv);

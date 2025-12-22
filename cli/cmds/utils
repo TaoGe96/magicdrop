@@ -18,6 +18,7 @@ set_rpc_url() {
         80094) RPC_URL="https://rpc.berachain.com" ;; # Berachain
         43114) RPC_URL="https://api.avax.network/ext/bc/C/rpc" ;; # Avalanche
         143) RPC_URL="https://evm-router.magiceden.io/monad/mainnet/me2024" ;; # Monad
+        4326) RPC_URL="https://evm-router.magiceden.io/megaeth/mainnet/me2024" ;; # MegaETH
         *) echo "Unsupported chain id"; exit 1 ;;
     esac
 
@@ -40,6 +41,7 @@ chain_id_to_symbol() {
         10143) echo "MON" ;;
         43114) echo "AVAX" ;;
         143) echo "MON" ;;
+        4326) echo "MEGA" ;;
         *) echo "Unknown" ;;
     esac
 }
@@ -60,6 +62,7 @@ chain_id_to_explorer_url() {
         10143) echo "https://testnet.monadexplorer.com" ;;
         43114) echo "https://snowtrace.io" ;;
         143) echo "https://monadvision.com" ;;
+        4326) echo "https://TBD" ;;
         *) echo "Unknown" ;;
     esac
 }

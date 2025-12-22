@@ -32,20 +32,30 @@ export const LIMITBREAK_TRANSFER_VALIDATOR_V3_ABSTRACT =
   '0x3203c3f64312AF9344e42EF8Aa45B97C9DFE4594';
 export const LIMITBREAK_TRANSFER_VALIDATOR_V3_BERACHAIN =
   '0x721c002b0059009a671d00ad1700c9748146cd1b';
+export const LIMITBREAK_TRANSFER_VALIDATOR_V5 =
+  '0x721c008fdff27bf06e7e123956e2fe03b63342e3';
 
 export const ABSTRACT_FACTORY_ADDRESS =
   '0x4a08d3F6881c4843232EFdE05baCfb5eAaB35d19';
 export const AVALANCHE_FACTORY_ADDRESS =
   '0x0b49bDcf2eC9329Fa6F42DCCC66e8906a3E4ACF0';
+export const MONAD_FACTORY_ADDRESS =
+  '0x00000000bEa935F8315156894Aa4a45D3c7a0075';
 export const DEFAULT_FACTORY_ADDRESS =
   '0x000000009e44eBa131196847C685F20Cd4b68aC4';
+export const MEGAETH_FACTORY_ADDRESS =
+  '0x00000000bEa935F8315156894Aa4a45D3c7a0075';
 
 export const ABSTRACT_REGISTRY_ADDRESS =
   '0x9b60ad31F145ec7EE3c559153bB57928B65C0F87';
 export const AVALANCHE_REGISTRY_ADDRESS =
   '0x09E0135dfBb7528D6eAA5beB69f3C030dF26F57c';
+export const MONAD_REGISTRY_ADDRESS =
+  '0x000000000e447e71b2EC36CD62048Dd2a1Cd0a57';
 export const DEFAULT_REGISTRY_ADDRESS =
   '0x00000000caF1E3978e291c5Fb53FeedB957eC146';
+export const MEGAETH_REGISTRY_ADDRESS =
+  '0x000000000e447e71b2EC36CD62048Dd2a1Cd0a57';
 
 export const ICREATOR_TOKEN_INTERFACE_ID = '0xad0d7f6c'; // type(ICreatorToken).interfaceId
 export const TRUE_HEX =
@@ -77,6 +87,7 @@ export enum SUPPORTED_CHAINS {
   ABSTRACT = 2741,
   BERACHAIN = 80094,
   MONAD = 143,
+  MEGAETH = 4326,
 }
 
 export const supportedChainNames: { [key in SUPPORTED_CHAINS]: string } = {
@@ -92,6 +103,7 @@ export const supportedChainNames: { [key in SUPPORTED_CHAINS]: string } = {
   [SUPPORTED_CHAINS.ABSTRACT]: 'abstract',
   [SUPPORTED_CHAINS.BERACHAIN]: 'berachain',
   [SUPPORTED_CHAINS.MONAD]: 'monad',
+  [SUPPORTED_CHAINS.MEGAETH]: 'megaeth',
 };
 
 export const rpcUrls: { [chainId in SUPPORTED_CHAINS]: string } = {
@@ -117,6 +129,8 @@ export const rpcUrls: { [chainId in SUPPORTED_CHAINS]: string } = {
     'https://evm-router.magiceden.io/monad/mainnet/me2024', // Monad
   [SUPPORTED_CHAINS.AVALANCHE]:
     'https://evm-router.magiceden.io/avalanche/mainnet/me2024', // Avalanche
+  [SUPPORTED_CHAINS.MEGAETH]:
+    'https://evm-router.magiceden.io/megaeth/mainnet/me2024', // MegaETH
 };
 
 export const explorerUrls: { [chainId in SUPPORTED_CHAINS]: string } = {
@@ -132,6 +146,7 @@ export const explorerUrls: { [chainId in SUPPORTED_CHAINS]: string } = {
   [SUPPORTED_CHAINS.BERACHAIN]: 'https://berascan.com', // Berachain
   [SUPPORTED_CHAINS.MONAD]: 'https://monadvision.com', // Monad
   [SUPPORTED_CHAINS.AVALANCHE]: 'https://snowtrace.io', // Avalanche
+  [SUPPORTED_CHAINS.MEGAETH]: 'https://TBD', // MegaETH
 };
 
 export const DEFAULT_TOKEN_URI_SUFFIX = '.json';
@@ -146,3 +161,9 @@ export const DEFAULT_MERKLE_ROOT =
   '0x0000000000000000000000000000000000000000000000000000000000000000';
 
 export const STANDARD_GAS_LIMIT = 21000; // Standard gas limit for native transfers
+
+// Setup function signatures for ERC721 contracts
+export const LEGACY_SETUP_SIGNATURE =
+  'function setup(string,string,uint256,uint256,address,address,(uint80,uint80,uint32,bytes32,uint24,uint256,uint256)[],address,uint96)';
+export const SETUP_SIGNATURE =
+  'function setup(string,string,uint256,uint256,address,address,(uint80,uint32,bytes32,uint24,uint256,uint256)[],address,uint96)';

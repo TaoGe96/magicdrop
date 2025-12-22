@@ -13,9 +13,14 @@ import {
   LIMITBREAK_TRANSFER_VALIDATOR_V3,
   LIMITBREAK_TRANSFER_VALIDATOR_V3_ABSTRACT,
   LIMITBREAK_TRANSFER_VALIDATOR_V3_BERACHAIN,
+  LIMITBREAK_TRANSFER_VALIDATOR_V5,
   MAGIC_EDEN_DEFAULT_LIST_ID,
   MAGIC_EDEN_POLYGON_LIST_ID,
   ME_TRANSFER_VALIDATOR_V3,
+  MONAD_FACTORY_ADDRESS,
+  MONAD_REGISTRY_ADDRESS,
+  MEGAETH_FACTORY_ADDRESS,
+  MEGAETH_REGISTRY_ADDRESS,
   SUPPORTED_CHAINS,
   supportedChainNames,
   TOKEN_STANDARD,
@@ -33,10 +38,25 @@ import {
   polygon,
   sei,
   sepolia,
+  monad,
 } from 'viem/chains';
 import { Hex } from 'viem';
 import { setBaseDir } from './setters';
-import { monad } from '../cmds/networks';
+import { defineChain } from 'viem';
+
+export const megaeth = defineChain({
+  id: 4326,
+  name: 'MegaETH',
+  nativeCurrency: { name: 'MEGA', symbol: 'MEGA', decimals: 18 },
+  rpcUrls: {
+    default: {
+      http: ['https://evm-router.magiceden.io/megaeth/mainnet/me2024'],
+    },
+  },
+  blockExplorers: {
+    default: { name: 'MegaETH Explorer', url: 'https://TBD' },
+  },
+});
 
 /**
  * Retrieves the transfer validator address based on the network (chain ID).
@@ -61,9 +81,24 @@ export const getTransferValidatorAddress = (chainId: SUPPORTED_CHAINS): Hex => {
     case SUPPORTED_CHAINS.BERACHAIN:
       return LIMITBREAK_TRANSFER_VALIDATOR_V3_BERACHAIN;
 
+    case SUPPORTED_CHAINS.MONAD:
+    case SUPPORTED_CHAINS.MEGAETH:
+      return LIMITBREAK_TRANSFER_VALIDATOR_V5;
+
     default:
       return LIMITBREAK_TRANSFER_VALIDATOR_V3;
   }
+};
+
+/**
+ * Check if the transfer validator address is V5.
+ * @param address The transfer validator address.
+ * @returns True if the address is V5, false otherwise.
+ */
+export const isTransferValidatorV5 = (address: Hex): boolean => {
+  return (
+    address.toLowerCase() === LIMITBREAK_TRANSFER_VALIDATOR_V5.toLowerCase()
+  );
 };
 
 export const getZksyncFlag = (chainId: SUPPORTED_CHAINS): string => {
@@ -98,6 +133,8 @@ export const getSymbolFromChainId = (chainId: SUPPORTED_CHAINS): string => {
       return 'MON';
     case SUPPORTED_CHAINS.AVALANCHE:
       return 'AVAX';
+    case SUPPORTED_CHAINS.MEGAETH:
+      return 'MEGA';
     default:
       return 'Unknown';
   }
@@ -149,14 +186,12 @@ export const getViemChainByChainId = (chainId: SUPPORTED_CHAINS) => {
       return berachain;
     case SUPPORTED_CHAINS.SEPOLIA:
       return sepolia;
-    case SUPPORTED_CHAINS.ARBITRUM:
-      return arbitrum;
     case SUPPORTED_CHAINS.ABSTRACT:
       return abstract;
     case SUPPORTED_CHAINS.MONAD:
       return monad;
-    case SUPPORTED_CHAINS.AVALANCHE:
-      return avalanche;
+    case SUPPORTED_CHAINS.MEGAETH:
+      return megaeth;
     default:
       throw new Error(`Unsupported chain ID: ${chainId}`);
   }
@@ -236,6 +271,14 @@ export const getFactoryAddress = (chainId: SUPPORTED_CHAINS): `0x${string}` => {
     return AVALANCHE_FACTORY_ADDRESS;
   }
 
+  if (chainId === SUPPORTED_CHAINS.MONAD) {
+    return MONAD_FACTORY_ADDRESS;
+  }
+
+  if (chainId === SUPPORTED_CHAINS.MEGAETH) {
+    return MEGAETH_FACTORY_ADDRESS;
+  }
+
   return DEFAULT_FACTORY_ADDRESS;
 };
 
@@ -248,6 +291,14 @@ export const getRegistryAddress = (
 
   if (chainId === SUPPORTED_CHAINS.AVALANCHE) {
     return AVALANCHE_REGISTRY_ADDRESS;
+  }
+
+  if (chainId === SUPPORTED_CHAINS.MONAD) {
+    return MONAD_REGISTRY_ADDRESS;
+  }
+
+  if (chainId === SUPPORTED_CHAINS.MEGAETH) {
+    return MEGAETH_REGISTRY_ADDRESS;
   }
 
   return DEFAULT_REGISTRY_ADDRESS;
@@ -280,6 +331,9 @@ export const getImplId = (
       return 5;
     case SUPPORTED_CHAINS.AVALANCHE:
       return 6;
+    case SUPPORTED_CHAINS.MONAD:
+    case SUPPORTED_CHAINS.MEGAETH:
+      return 2;
     default:
       return 8;
   }

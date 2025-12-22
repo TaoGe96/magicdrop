@@ -1,6 +1,6 @@
 import path from 'path';
 import { confirm } from '@inquirer/prompts';
-import { collapseAddress } from './common';
+import { collapseAddress, isLegacyContract } from './common';
 import {
   confirmDeployment,
   confirmSetup,
@@ -24,6 +24,8 @@ import { ContractManager } from './ContractManager';
 import { Hex } from 'viem';
 import {
   DEFAULT_MINT_CURRENCY,
+  LEGACY_SETUP_SIGNATURE,
+  SETUP_SIGNATURE,
   SUPPORTED_CHAINS,
   TOKEN_STANDARD,
 } from './constants';
@@ -248,6 +250,15 @@ export const setupContract = async (params: {
       throw new Error('No stages file or JSON provided.');
     }
 
+    // Get contract version to determine which ABI to use
+    const versionInfo = await cm.getContractVersion(contractAddress);
+    const version = versionInfo?.version;
+    const isLegacy = isLegacyContract(version);
+
+    console.log(
+      `Contract version: ${version || 'unknown (assuming legacy)'}, using ${isLegacy ? 'legacy' : 'new'} ABI format`,
+    );
+
     // Define setup selector based on token standard
     let uri = '';
     let tokenUriSuffix = '';
@@ -322,6 +333,7 @@ export const setupContract = async (params: {
         stagesData: stagesData as ERC721StageData[],
         royaltyReceiver,
         royaltyFee,
+        isLegacy,
       });
     } else {
       txHash = await sendERC1155SetupTransaction({
@@ -335,6 +347,7 @@ export const setupContract = async (params: {
         stagesData: stagesData as ERC1155StageData[],
         royaltyReceiver,
         royaltyFee,
+        isLegacy,
       });
     }
 
@@ -382,44 +395,82 @@ export const processStages = async (params: {
   }
 };
 
-export const getERC721ParsedStagesData = (stagesData: ERC721StageData[]) => {
-  const parsedStagesData = stagesData.map((stage) => {
-    return [
-      BigInt(stage.price),
-      BigInt(stage.mintFee),
-      stage.walletLimit,
-      stage.merkleRoot as Hex,
-      stage.maxStageSupply,
-      BigInt(stage.startTime),
-      BigInt(stage.endTime),
-    ] as readonly [bigint, bigint, number, Hex, number, bigint, bigint];
-  });
+export const getERC721ParsedStagesData = (
+  stagesData: ERC721StageData[],
+  isLegacy: boolean = false,
+) => {
+  if (isLegacy) {
+    // Legacy format includes mintFee
 
-  return parsedStagesData;
+    return stagesData.map((stage) => {
+      return [
+        BigInt(stage.price),
+        BigInt(stage.mintFee || 0),
+        stage.walletLimit,
+        stage.merkleRoot as Hex,
+        stage.maxStageSupply,
+        BigInt(stage.startTime),
+        BigInt(stage.endTime),
+      ] as readonly [bigint, bigint, number, Hex, number, bigint, bigint];
+    });
+  } else {
+    // New format without mintFee
+
+    return stagesData.map((stage) => {
+      return [
+        BigInt(stage.price),
+        stage.walletLimit,
+        stage.merkleRoot as Hex,
+        stage.maxStageSupply,
+        BigInt(stage.startTime),
+        BigInt(stage.endTime),
+      ] as readonly [bigint, number, Hex, number, bigint, bigint];
+    });
+  }
 };
 
-export const getERC1155ParsedStagesData = (stagesData: ERC1155StageData[]) => {
-  const parsedStagesData = stagesData.map((stage) => {
-    return [
-      stage.price.map((price) => BigInt(price)),
-      stage.mintFee.map((fee) => BigInt(fee)),
-      stage.walletLimit,
-      stage.merkleRoot,
-      stage.maxStageSupply,
-      BigInt(stage.startTime),
-      BigInt(stage.endTime),
-    ] as readonly [
-      bigint[],
-      bigint[],
-      number[],
-      Hex[],
-      number[],
-      bigint,
-      bigint,
-    ];
-  });
+export const getERC1155ParsedStagesData = (
+  stagesData: ERC1155StageData[],
+  isLegacy: boolean = false,
+) => {
+  if (isLegacy) {
+    // Legacy format includes mintFee
+    const parsedStagesData = stagesData.map((stage) => {
+      return [
+        stage.price.map((price) => BigInt(price)),
+        stage.mintFee ? stage.mintFee.map((fee) => BigInt(fee)) : [],
+        stage.walletLimit,
+        stage.merkleRoot,
+        stage.maxStageSupply,
+        BigInt(stage.startTime),
+        BigInt(stage.endTime),
+      ] as readonly [
+        bigint[],
+        bigint[],
+        number[],
+        Hex[],
+        number[],
+        bigint,
+        bigint,
+      ];
+    });
 
-  return parsedStagesData;
+    return parsedStagesData;
+  } else {
+    // New format without mintFee
+    const parsedStagesData = stagesData.map((stage) => {
+      return [
+        stage.price.map((price) => BigInt(price)),
+        stage.walletLimit,
+        stage.merkleRoot,
+        stage.maxStageSupply,
+        BigInt(stage.startTime),
+        BigInt(stage.endTime),
+      ] as readonly [bigint[], number[], Hex[], number[], bigint, bigint];
+    });
+
+    return parsedStagesData;
+  }
 };
 
 const sendERC721SetupTransaction = async ({
@@ -434,6 +485,7 @@ const sendERC721SetupTransaction = async ({
   stagesData,
   royaltyReceiver,
   royaltyFee,
+  isLegacy = false,
 }: {
   cm: ContractManager;
   contractAddress: Hex;
@@ -446,25 +498,55 @@ const sendERC721SetupTransaction = async ({
   stagesData: ERC721StageData[];
   royaltyReceiver: string;
   royaltyFee: number;
+  isLegacy?: boolean;
 }) => {
   try {
-    const setupSignature =
-      'function setup(string,string,uint256,uint256,address,address,(uint80,uint80,uint32,bytes32,uint24,uint256,uint256)[],address,uint96)';
+    const parsedStagesData = getERC721ParsedStagesData(stagesData, isLegacy);
 
-    const abi = AbiFunction.from(setupSignature);
+    let encodedData: Hex;
 
-    const parsedStagesData = getERC721ParsedStagesData(stagesData);
-    const encodedData = AbiFunction.encodeData(abi, [
-      uri as string,
-      tokenUriSuffix as string,
-      BigInt(maxMintableSupply as number),
-      BigInt(globalWalletLimit as number),
-      mintCurrency as Hex,
-      fundReceiver as Hex,
-      parsedStagesData,
-      royaltyReceiver as Hex,
-      BigInt(royaltyFee),
-    ]);
+    if (isLegacy) {
+      const abi = AbiFunction.from(LEGACY_SETUP_SIGNATURE);
+      encodedData = AbiFunction.encodeData(abi, [
+        uri,
+        tokenUriSuffix,
+        BigInt(maxMintableSupply),
+        BigInt(globalWalletLimit),
+        mintCurrency as Hex,
+        fundReceiver as Hex,
+        parsedStagesData as readonly (readonly [
+          bigint,
+          bigint,
+          number,
+          Hex,
+          number,
+          bigint,
+          bigint,
+        ])[],
+        royaltyReceiver as Hex,
+        BigInt(royaltyFee),
+      ]);
+    } else {
+      const abi = AbiFunction.from(SETUP_SIGNATURE);
+      encodedData = AbiFunction.encodeData(abi, [
+        uri,
+        tokenUriSuffix,
+        BigInt(maxMintableSupply),
+        BigInt(globalWalletLimit),
+        mintCurrency as Hex,
+        fundReceiver as Hex,
+        parsedStagesData as readonly (readonly [
+          bigint,
+          number,
+          Hex,
+          number,
+          bigint,
+          bigint,
+        ])[],
+        royaltyReceiver as Hex,
+        BigInt(royaltyFee),
+      ]);
+    }
 
     const hash = await cm.sendTransaction({
       to: contractAddress,
@@ -491,6 +573,7 @@ const sendERC1155SetupTransaction = async ({
   stagesData,
   royaltyReceiver,
   royaltyFee,
+  isLegacy = false,
 }: {
   cm: ContractManager;
   contractAddress: Hex;
@@ -502,21 +585,26 @@ const sendERC1155SetupTransaction = async ({
   stagesData: ERC1155StageData[];
   royaltyReceiver: string;
   royaltyFee: number;
+  isLegacy?: boolean;
 }) => {
   try {
-    const setupSignature =
-      'function setup(string,uint256[],uint256[],address,address,(uint80[],uint80[],uint32[],bytes32[],uint24[],uint256,uint256)[],address,uint96)';
+    // Choose setup signature based on version
+    const setupSignature = isLegacy
+      ? 'function setup(string,uint256[],uint256[],address,address,(uint80[],uint80[],uint32[],bytes32[],uint24[],uint256,uint256)[],address,uint96)'
+      : 'function setup(string,uint256[],uint256[],address,address,(uint80[],uint32[],bytes32[],uint24[],uint256,uint256)[],address,uint96)';
 
     const abi = AbiFunction.from(setupSignature);
 
-    const parsedStagesData = getERC1155ParsedStagesData(stagesData);
+    const parsedStagesData = getERC1155ParsedStagesData(stagesData, isLegacy);
+
+    // Type assertion needed because AbiFunction.encodeData cannot infer union types
     const encodedData = AbiFunction.encodeData(abi, [
       uri as string,
       maxMintableSupply.map((supply) => BigInt(supply)),
       globalWalletLimit.map((limit) => BigInt(limit)),
       mintCurrency as Hex,
       fundReceiver as Hex,
-      parsedStagesData,
+      parsedStagesData as any,
       royaltyReceiver as Hex,
       BigInt(royaltyFee),
     ]);
