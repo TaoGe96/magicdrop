@@ -19,6 +19,8 @@ import {
   ME_TRANSFER_VALIDATOR_V3,
   MONAD_FACTORY_ADDRESS,
   MONAD_REGISTRY_ADDRESS,
+  MEGAETH_FACTORY_ADDRESS,
+  MEGAETH_REGISTRY_ADDRESS,
   SUPPORTED_CHAINS,
   supportedChainNames,
   TOKEN_STANDARD,
@@ -40,6 +42,7 @@ import {
 } from 'viem/chains';
 import { Hex } from 'viem';
 import { setBaseDir } from './setters';
+import { defineChain } from 'viem';
 
 export const megaeth = defineChain({
   id: 4326,
@@ -79,6 +82,7 @@ export const getTransferValidatorAddress = (chainId: SUPPORTED_CHAINS): Hex => {
       return LIMITBREAK_TRANSFER_VALIDATOR_V3_BERACHAIN;
 
     case SUPPORTED_CHAINS.MONAD:
+    case SUPPORTED_CHAINS.MEGAETH:
       return LIMITBREAK_TRANSFER_VALIDATOR_V5;
 
     default:
@@ -184,8 +188,8 @@ export const getViemChainByChainId = (chainId: SUPPORTED_CHAINS) => {
       return sepolia;
     case SUPPORTED_CHAINS.ABSTRACT:
       return abstract;
-    // case SUPPORTED_CHAINS.MONAD:
-    //   return monad;
+    case SUPPORTED_CHAINS.MONAD:
+      return monad;
     case SUPPORTED_CHAINS.MEGAETH:
       return megaeth;
     default:
@@ -271,6 +275,10 @@ export const getFactoryAddress = (chainId: SUPPORTED_CHAINS): `0x${string}` => {
     return MONAD_FACTORY_ADDRESS;
   }
 
+  if (chainId === SUPPORTED_CHAINS.MEGAETH) {
+    return MEGAETH_FACTORY_ADDRESS;
+  }
+
   return DEFAULT_FACTORY_ADDRESS;
 };
 
@@ -287,6 +295,10 @@ export const getRegistryAddress = (
 
   if (chainId === SUPPORTED_CHAINS.MONAD) {
     return MONAD_REGISTRY_ADDRESS;
+  }
+
+  if (chainId === SUPPORTED_CHAINS.MEGAETH) {
+    return MEGAETH_REGISTRY_ADDRESS;
   }
 
   return DEFAULT_REGISTRY_ADDRESS;
@@ -320,6 +332,7 @@ export const getImplId = (
     case SUPPORTED_CHAINS.AVALANCHE:
       return 6;
     case SUPPORTED_CHAINS.MONAD:
+    case SUPPORTED_CHAINS.MEGAETH:
       return 2;
     default:
       return 8;
