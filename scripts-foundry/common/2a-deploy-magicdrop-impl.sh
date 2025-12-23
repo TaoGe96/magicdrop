@@ -22,13 +22,13 @@ STANDARD=""
 IMPL_EXPECTED_ADDRESS="0x0000000000000000000000000000000000000000"
 IMPL_SALT=""
 USE_CASE=""
-IS_ERC721C=false
+IS_CREATOR_STANDARD=false
 ZK_SYNC=false
 
 # Function to display usage
 usage() {
-    # Example Usage: ./2a-deploy-magicdrop-impl.sh --chain-id 137 --token-standard ERC721 --use-case launchpad --is-erc721c true --expected-address 0x0000000000000000000000000000000000000000 --salt 0x0000000000000000000000000000000000000000000000000000000000000000
-    echo "Usage: $0 --chain-id <chain id> --token-standard <token standard> --use-case <launchpad | self-serve> --is-erc721c <bool (optional)> --expected-address <expected address (optional)> --salt <salt> --zk-sync (optional)"
+    # Example Usage: ./2a-deploy-magicdrop-impl.sh --chain-id 137 --token-standard ERC721 --use-case launchpad --is-creator-standard true --expected-address 0x0000000000000000000000000000000000000000 --salt 0x0000000000000000000000000000000000000000000000000000000000000000
+    echo "Usage: $0 --chain-id <chain id> --token-standard <token standard> --use-case <launchpad | self-serve> --is-creator-standard <bool (optional)> --expected-address <expected address (optional)> --salt <salt> --zk-sync (optional)"
     exit 1
 }
 
@@ -38,7 +38,7 @@ while [[ "$#" -gt 0 ]]; do
         --chain-id) CHAIN_ID=$2; shift ;;
         --token-standard) STANDARD=$2; shift ;;
         --use-case) USE_CASE=$2; shift ;;
-        --is-erc721c) IS_ERC721C=$2; shift ;;
+        --is-creator-standard) IS_CREATOR_STANDARD=$2; shift ;;
         --expected-address) IMPL_EXPECTED_ADDRESS=$2; shift ;;
         --salt) IMPL_SALT=$2; shift ;;
         --zk-sync) ZK_SYNC=true ;;
@@ -71,7 +71,7 @@ echo "==================== DEPLOYMENT DETAILS ===================="
 echo "Chain ID:                     $CHAIN_ID"
 echo "RPC URL:                      $RPC_URL"
 echo "Token Standard:               $STANDARD"
-echo "isERC721C:                    $IS_ERC721C"
+echo "isCreatorStandard:            $IS_CREATOR_STANDARD"
 echo "Use Case:                     $USE_CASE"
 echo "ZKsync:                       $ZK_SYNC"
 echo "Expected Address:             $IMPL_EXPECTED_ADDRESS"
@@ -93,7 +93,7 @@ echo "============= DEPLOYING MAGICDROP IMPLEMENTATION ============="
 echo ""
 
 # remove --verify when deploying on Sei Chain. You will need to verify manually.
-CHAIN_ID=$CHAIN_ID RPC_URL=$RPC_URL TOKEN_STANDARD=$STANDARD IMPL_EXPECTED_ADDRESS=$IMPL_EXPECTED_ADDRESS IMPL_SALT=$IMPL_SALT IS_ERC721C=$IS_ERC721C USE_CASE=$USE_CASE ZK_SYNC=$ZK_SYNC forge script ./DeployMagicDropImplementation.s.sol:DeployMagicDropImplementation \
+CHAIN_ID=$CHAIN_ID RPC_URL=$RPC_URL TOKEN_STANDARD=$STANDARD IMPL_EXPECTED_ADDRESS=$IMPL_EXPECTED_ADDRESS IMPL_SALT=$IMPL_SALT IS_CREATOR_STANDARD=$IS_CREATOR_STANDARD USE_CASE=$USE_CASE ZK_SYNC=$ZK_SYNC forge script ./DeployMagicDropImplementation.s.sol:DeployMagicDropImplementation \
   --rpc-url $RPC_URL \
   --broadcast \
   --optimizer-runs 777 \

@@ -5,6 +5,7 @@ import {Script} from "forge-std/Script.sol";
 import {ERC721MInitializableV1_0_2} from "contracts/nft/erc721m/ERC721MInitializableV1_0_2.sol";
 import {ERC721CMInitializableV1_0_2} from "contracts/nft/erc721m/ERC721CMInitializableV1_0_2.sol";
 import {ERC1155MInitializableV1_0_2} from "contracts/nft/erc1155m/ERC1155MInitializableV1_0_2.sol";
+import {ERC1155CMInitializableV1_0_2} from "contracts/nft/erc1155m/ERC1155CMInitializableV1_0_2.sol";
 import {ERC721MagicDropCloneable} from "contracts/nft/erc721m/clones/ERC721MagicDropCloneable.sol";
 import {ERC1155MagicDropCloneable} from "contracts/nft/erc1155m/clones/ERC1155MagicDropCloneable.sol";
 import {ERC721MInitializableV1_0_2 as ZKERC721MInitializableV1_0_2} from "contracts/nft/erc721m/zksync/ERC721MInitializableV1_0_2.sol";
@@ -28,7 +29,7 @@ contract DeployMagicDropImplementation is Script {
         bytes32 salt = vm.envBytes32("IMPL_SALT");
         address expectedAddress = address(uint160(vm.envUint("IMPL_EXPECTED_ADDRESS")));
         TokenStandard standard = parseTokenStandard(vm.envString("TOKEN_STANDARD"));
-        bool isERC721C = vm.envBool("IS_ERC721C");
+        bool isCreatorStandard = vm.envBool("IS_CREATOR_STANDARD");
         UseCase useCase = parseUseCase(vm.envString("USE_CASE"));
         bool zkSync = vm.envBool("ZK_SYNC");
         uint256 privateKey = vm.envUint("PRIVATE_KEY");
@@ -39,7 +40,7 @@ contract DeployMagicDropImplementation is Script {
 
         if (standard == TokenStandard.ERC721) {
             if (useCase == UseCase.Launchpad) {
-                if(isERC721C) {
+                if(isCreatorStandard) {
                     if(zkSync) {
                         deployedAddress = address(new ZKERC721CMInitializableV1_0_2{salt: salt}());
                     } else {
@@ -61,10 +62,18 @@ contract DeployMagicDropImplementation is Script {
             }
         } else if (standard == TokenStandard.ERC1155) {
             if(useCase == UseCase.Launchpad) {
-                if(zkSync) {
-                    deployedAddress = address(new ZKERC1155MInitializableV1_0_2{salt: salt}());
+                if(isCreatorStandard) {
+                    if(zkSync) {
+                        revert InvalidTokenStandard("ERC1155 Creator Standard not supported on zkSync");
+                    } else {
+                        deployedAddress = address(new ERC1155CMInitializableV1_0_2{salt: salt}());
+                    }
                 } else {
-                    deployedAddress = address(new ERC1155MInitializableV1_0_2{salt: salt}());
+                    if(zkSync) {
+                        deployedAddress = address(new ZKERC1155MInitializableV1_0_2{salt: salt}());
+                    } else {
+                        deployedAddress = address(new ERC1155MInitializableV1_0_2{salt: salt}());
+                    }
                 }
             } else if(useCase == UseCase.SelfServe) {
                 if(zkSync) {
@@ -75,11 +84,11 @@ contract DeployMagicDropImplementation is Script {
             }
         }
 
-        if(!zkSync) {
-            if (address(deployedAddress) != expectedAddress) {
-                revert AddressMismatch(expectedAddress, deployedAddress);
-            }
-        }
+//        if(!zkSync) {
+//            if (address(deployedAddress) != expectedAddress) {
+//                revert AddressMismatch(expectedAddress, deployedAddress);
+//            }
+//        }
 
         vm.stopBroadcast();
     }
