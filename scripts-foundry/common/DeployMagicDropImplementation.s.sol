@@ -84,11 +84,11 @@ contract DeployMagicDropImplementation is Script {
             }
         }
 
-//        if(!zkSync) {
-//            if (address(deployedAddress) != expectedAddress) {
-//                revert AddressMismatch(expectedAddress, deployedAddress);
-//            }
-//        }
+        if(!zkSync) {
+            if (address(deployedAddress) != expectedAddress) {
+                revert AddressMismatch(expectedAddress, deployedAddress);
+            }
+        }
 
         vm.stopBroadcast();
     }

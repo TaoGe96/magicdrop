@@ -33,7 +33,7 @@ export interface ERC721Collection {
   cosigner: string;
   tokenUriSuffix: string;
   uri: string;
-  useERC721C: boolean;
+  useCreatorTokenStandard: boolean;
   stages: ERC721Stage[];
   deployment?: Deployment;
 }
@@ -74,7 +74,7 @@ export type DeployContractConfig = Collection & {
   contractManager: ContractManager;
   totalTokens?: number;
   stagesFile?: string;
-  useERC721C?: boolean;
+  useCreatorTokenStandard?: boolean;
 };
 
 export interface Log {

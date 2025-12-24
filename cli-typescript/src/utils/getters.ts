@@ -308,35 +308,47 @@ export const getRegistryAddress = (
  * The latest MagicDrop v1.0.1 implementation ID for each supported chain.
  * @param chainId The chain ID to check the balance on.
  * @param tokenStandard ERC721 or ERC1155
- * @param useERC721C use ERC721C
+ * @param useCreatorTokenStandard use ERC721C
  * @returns implementation ID
  */
 export const getImplId = (
   chainId: SUPPORTED_CHAINS,
   tokenStandard: TOKEN_STANDARD,
-  useERC721C?: boolean,
+  useCreatorTokenStandard?: boolean,
 ): number => {
-  if (tokenStandard !== TOKEN_STANDARD.ERC721 || !useERC721C) {
-    return DEFAULT_IMPL_ID;
+  if (useCreatorTokenStandard) {
+    if (tokenStandard === TOKEN_STANDARD.ERC721) {
+      switch (chainId) {
+        case SUPPORTED_CHAINS.ABSTRACT:
+          return 7; // ERC721C implementation ID / abstract
+        case SUPPORTED_CHAINS.BASE:
+          return 11;
+        case SUPPORTED_CHAINS.ETHEREUM:
+          return 10;
+        case SUPPORTED_CHAINS.BERACHAIN:
+          return 5;
+        case SUPPORTED_CHAINS.AVALANCHE:
+          return 6;
+        case SUPPORTED_CHAINS.MONAD:
+        case SUPPORTED_CHAINS.MEGAETH:
+          return 2;
+        default:
+          return 8;
+      }
+    }
+    if (tokenStandard === TOKEN_STANDARD.ERC1155) {
+      switch (chainId) {
+        case SUPPORTED_CHAINS.ETHEREUM:
+          throw new Error('ERC1155C not supported on Ethereum');
+        case SUPPORTED_CHAINS.MONAD:
+        case SUPPORTED_CHAINS.MEGAETH:
+          return 2;
+        default:
+          return 2;
+      }
+    }
   }
-
-  switch (chainId) {
-    case SUPPORTED_CHAINS.ABSTRACT:
-      return 7; // ERC721C implementation ID / abstract
-    case SUPPORTED_CHAINS.BASE:
-      return 11;
-    case SUPPORTED_CHAINS.ETHEREUM:
-      return 10;
-    case SUPPORTED_CHAINS.BERACHAIN:
-      return 5;
-    case SUPPORTED_CHAINS.AVALANCHE:
-      return 6;
-    case SUPPORTED_CHAINS.MONAD:
-    case SUPPORTED_CHAINS.MEGAETH:
-      return 2;
-    default:
-      return 8;
-  }
+  return DEFAULT_IMPL_ID;
 };
 
 export const getStandardId = (tokenStandard: TOKEN_STANDARD): string => {

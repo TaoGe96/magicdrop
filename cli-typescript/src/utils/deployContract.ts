@@ -62,7 +62,7 @@ export const deployContract = async ({
   mintCurrency,
   contractManager: cm,
   totalTokens,
-  useERC721C,
+  useCreatorTokenStandard,
 }: DeployContractConfig) => {
   showText('Deploying a new collection...');
 
@@ -71,7 +71,7 @@ export const deployContract = async ({
   const factoryAddress = getFactoryAddress(cm.chainId);
   const registryAddress = getRegistryAddress(cm.chainId);
   const standardId = getStandardId(tokenStandard);
-  const implId = getImplId(cm.chainId, tokenStandard, useERC721C);
+  const implId = getImplId(cm.chainId, tokenStandard, useCreatorTokenStandard);
 
   const deploymentFee = await cm.getDeploymentFee(
     registryAddress,
@@ -128,6 +128,8 @@ export const deployContract = async ({
     );
 
     await cm.setTransferValidator(contractAddress);
+    // Wait 5 seconds to avoid nonce / mempool priority issues
+    await new Promise((resolve) => setTimeout(resolve, 5000));
     await cm.setTransferList(contractAddress);
 
     const freezeCollection = await confirm({

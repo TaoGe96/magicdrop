@@ -65,7 +65,7 @@ get_registry_address() {
 
 # The latest MagicDrop v1.0.1 implementation ID for each supported chain.
 get_impl_id() {
-    if [ "$token_standard" == "ERC721" ] && [ "$use_erc721c" == "true" ]; then
+    if [ "$token_standard" == "ERC721" ] && [ "$use_creator_token_standard" == "true" ]; then
         if [ "$chain_id" == "2741" ]; then
             echo "7" # ERC721C implementation ID / abstract
         elif [ "$chain_id" == "8453" ]; then

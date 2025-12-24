@@ -114,9 +114,9 @@ export const validateConfig = (
       errors.push('Invalid or missing maxMintableSupply. It should a number.');
     }
 
-    if (typeof config.useERC721C !== 'boolean') {
+    if (typeof config.useCreatorTokenStandard !== 'boolean') {
       errors.push(
-        'Invalid or missing useERC721C. It should either be true or false.',
+        'Invalid or missing useCreatorTokenStandard. It should either be true or false.',
       );
     }
 

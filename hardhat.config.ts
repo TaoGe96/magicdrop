@@ -260,8 +260,8 @@ task('deploy', 'Deploy ERC721M')
     types.boolean,
   )
   .addOptionalParam<boolean>(
-    'useerc721c',
-    'whether or not to use ERC721C',
+    'usecreatortokenstandard',
+    'whether or not to use creator token standard',
     true,
     types.boolean,
   )

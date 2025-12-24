@@ -13,7 +13,7 @@ export const ERC721_TEMPLATE = {
   cosigner: '0x0000000000000000000000000000000000000000',
   tokenUriSuffix: '.json',
   uri: '',
-  useERC721C: false,
+  useCreatorTokenStandard: false,
   stages: [
     {
       price: '',

@@ -115,7 +115,7 @@ load_collection() {
     cosigner=$(jq -r '.cosigner' "$collection_file")
     token_uri_suffix=$(jq -r '.tokenUriSuffix' "$collection_file")
     contract_uri=$(jq -r '.uri' "$collection_file")
-    use_erc721c=$(jq -r '.useERC721C' "$collection_file")
+    use_creator_token_standard=$(jq -r '.useCreatorTokenStandard' "$collection_file")
 
     if [[ "$token_standard" == "ERC721" ]]; then
         base_uri=$contract_uri

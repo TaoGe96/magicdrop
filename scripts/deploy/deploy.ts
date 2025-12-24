@@ -26,7 +26,7 @@ interface IDeployParams {
   openedition?: boolean;
   mintcurrency?: string;
   fundreceiver?: string;
-  useerc721c?: boolean;
+  usecreatortokenstandard?: boolean;
   useerc2198?: boolean;
   erc2198royaltyreceiver?: string;
   erc2198royaltyfeenumerator?: number;
@@ -46,9 +46,9 @@ export const deploy = async (
   await hre.run('compile');
   let contractName: string = ContractDetails.ERC721M.name;
 
-  if (args.useerc721c && args.useerc2198) {
+  if (args.usecreatortokenstandard && args.useerc2198) {
     contractName = ContractDetails.ERC721CMRoyalties.name;
-  } else if (args.useerc721c) {
+  } else if (args.usecreatortokenstandard) {
     contractName = ContractDetails.ERC721CM.name;
   } else if (args.useoperatorfilterer) {
     contractName = ContractDetails.ERC721MOperatorFilterer.name;
